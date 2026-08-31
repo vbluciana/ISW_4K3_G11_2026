@@ -1,4 +1,4 @@
-# ISW_4K3_GX_2Q_2026
+# ISW_4K3_G11_2Q_2026
 
 Este repositorio pertenece al **Grupo 11** de la materia **Ingeniería y Calidad de Software** de la UTN FRC, curso **4K3**, segundo cuatrimestre del año 2026.
 
@@ -65,7 +65,11 @@ ISW_4K3_GX_2Q_2026/
 ## Reglas de nombrado
 
 - Todos los nombres de carpetas y archivos se escriben en formato **snake_case**.
-- Los commits siguen el estándar [**Commits Convencionales 1.0.0**](https://www.conventionalcommits.org/es/v1.0.0/).
+- Se utiliza **UpperCamelCase** (`CamelCase`) únicamente para nombrar el siguiente contenido dentro de estos ítems:
+  - En **Ejercicios resueltos** (`ej_<<tema>>_<<legajo_alumno>>_v<<numero>>.pdf`) → el campo `<<tema>>`.
+  - En **Trabajo de investigación grupal** (`ti_<<numero>>_<<nombre_trabajo>>_v<<version>>.pdf`) → el campo `<<nombre_trabajo>>`.
+  - En **Trabajo práctico grupal** (`tp_<<numero>>_<<nombre_trabajo>>_v<<version>>.pdf`) → el campo `<<nombre_trabajo>>`.
+- Los commits siguen el estándar [**Commits Convencionales 1.0.0**](https://www.conventionalcommits.org/es/v1.0.0/): el **tipo** del commit se escribe en **inglés** (`feat`, `fix`, `docs`, etc.) y el **cuerpo/descripción** se escribe en **español**.
 
 ---
 
