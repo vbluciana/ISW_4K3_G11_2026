@@ -30,7 +30,7 @@ Este repositorio pertenece al **Grupo 11** de la materia **Ingeniería y Calidad
 ISW_4K3_GX_2Q_2026/
 ├── materiales_alumnos/
 │   ├── teorico/
-│   │   └── resumen_u<<numero>>_v<<numero>>.pdf
+│   │   └── resumen_u<<numero>>_<<legajo_alumno>>_v<<numero>>.pdf
 │   └── practico/
 │       └── ej_<<tema>>_<<legajo_alumno>>_v<<numero>>.pdf
 ├── trabajos_entregables/
@@ -52,7 +52,7 @@ ISW_4K3_GX_2Q_2026/
 
 | Nombre de ítem de configuración | Regla de nombrado | Ubicación física | Tipo de ítem |
 |---|---|---|---|
-| Resumen teórico de unidad | `resumen_u<<numero>>_v<<numero>>.pdf` | `materiales_alumnos/teorico` | Iteración |
+| Resumen teórico de unidad | `resumen_u<<numero>>_<<legajo_alumno>>_v<<numero>>.pdf` | `materiales_alumnos/teorico` | Iteración |
 | Ejercicios resueltos | `ej_<<tema>>_<<legajo_alumno>>_v<<numero>>.pdf` | `materiales_alumnos/practico` | Iteración |
 | Trabajo de investigación grupal | `ti_<<numero>>_<<nombre_trabajo>>_v<<version>>.pdf` | `trabajos_entregables/trabajos_investigacion_grupal` | Producto |
 | Trabajo práctico grupal | `tp_<<numero>>_<<nombre_trabajo>>_v<<version>>.pdf` | `trabajos_entregables/trabajos_practicos_grupal` | Producto |
