@@ -56,7 +56,7 @@ Se conserva `gestion` para el plan de SCM existente. Las carpetas de bibliograf�
 | Resumen teórico de parcial | `resumen_p<<numero>>_<<legajo_alumno>>.pdf` | `materiales_alumnos/teorico` | Teórico |
 | Ejercicios resueltos | `ej_<<tema>>_<<legajo_alumno>>.pdf` | `materiales_alumnos/practico` | Práctico |
 | Material bibliográfico | `<<nombre_archivo>>.pdf` | `materiales_catedra/bibliografia/<<tema>>` | Teórico |
-| Templates para prácticos y parciales | `template_<<tema>>.pdf` | `materiales_catedra/templates` | Información |
+| Templates para prácticos y parciales | `template_<<tema>>.<<extension>>` | `materiales_catedra/templates` | Información |
 | Presentaciones de clase | `<<numero>>_<<nombre>>.pdf` | `materiales_catedra/presentaciones_clases` | Teórico |
 | Guías de estudio | `guia_<<nombre_guia>>.pdf` | `materiales_catedra/casos_estudio` | Práctico |
 | Trabajo de investigación grupal | `ti_<<numero>>_<<nombre_trabajo>>.pdf` | `trabajos_entregables/trabajos_investigacion_grupal` | Entregable |
