@@ -75,6 +75,25 @@ describe('PasarelaDePagoMercadoPago', () => {
     expect(argumento.body.auto_return).toBe('approved')
   })
 
+  it('envía auto_return "approved" y arma las back_urls con el túnel de Cloudflare', async () => {
+    preferenceCreateMock.mockResolvedValue({ init_point: 'x', sandbox_init_point: 'y' })
+    const pasarelaTunnel = new PasarelaDePagoMercadoPago({
+      accessToken: 'TEST-ACCESS-TOKEN',
+      frontendUrl: 'https://parrot-quick.trycloudflare.com/'
+    })
+
+    const visitantes = [Visitante.crear({ edad: 30, tipoPase: 'regular' })]
+    await pasarelaTunnel.crearPreferenciaPago({ visitantes, email: 'ana@ecoharmony.com' })
+
+    const [argumento] = preferenceCreateMock.mock.calls[0]
+    expect(argumento.body.back_urls).toEqual({
+      success: 'https://parrot-quick.trycloudflare.com/pago-exitoso',
+      failure: 'https://parrot-quick.trycloudflare.com/pago-fallido',
+      pending: 'https://parrot-quick.trycloudflare.com/pago-pendiente'
+    })
+    expect(argumento.body.auto_return).toBe('approved')
+  })
+
   it('propaga el error si Mercado Pago rechaza la creación de la preferencia', async () => {
     preferenceCreateMock.mockRejectedValue(new Error('token inválido'))
 
