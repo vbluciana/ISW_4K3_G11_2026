@@ -42,44 +42,44 @@ tp6/
 
 ## Puesta en marcha
 
-### 1. Backend
+### Arranque completo con Docker Compose (recomendado)
+
+```bash
+cp .env.example .env
+```
+
+Completar en `.env` el access token de prueba/sandbox de Mercado Pago y, si se
+quiere enviar el comprobante, las credenciales de Gmail. Luego levantar toda la app:
+
+```bash
+docker compose up --build
+```
+
+Cloudflare Quick Tunnel publica el frontend con una URL temporal, sin cuenta ni
+authtoken. El backend espera a que el tunnel genere la URL pública y, automáticamente,
+usa esa URL como `FRONTEND_URL` para armar las `back_urls` de Mercado Pago. La app
+queda disponible localmente en <http://localhost:5173> y el checkout usa la URL pública
+del túnel. Para ver la URL:
+
+```bash
+docker compose logs -f cloudflared
+```
+
+Al volver con pago aprobado se muestra **“¡Gracias por tu compra!”**. Los datos de
+usuarios se conservan en un volumen de Docker.
+
+Para detener los servicios, ejecutar `docker compose down`. Para desarrollo sin Docker,
+se pueden iniciar backend y frontend por separado; `npm run dev` usa el proxy de Vite a
+`http://localhost:3000`.
+
+### Tests del backend
 
 ```bash
 cd backend
 npm install
-cp .env.example .env
-```
-
-Completar `.env` con credenciales propias (**nunca commitear este archivo**):
-
-```
-PORT=3000
-MERCADOPAGO_ACCESS_TOKEN= APP_USR-2602591896409361-101218-9c24030a27b1b4d90e82d07540444e3b-3760410522  # Access Token de prueba/sandbox de la cuenta del grupo
-MERCADOPAGO_PUBLIC_KEY= APP_USR-b13f1c25-b865-40de-b9ae-847e844d533e
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=465
-SMTP_SECURE=true
-SMTP_USER=   # Cuenta de Gmail usada para enviar el comprobante
-SMTP_PASS=     # Contraseña de aplicación de Gmail (no la contraseña de la cuenta)
-FRONTEND_URL=http://localhost:5173
-```
-
-```bash
-npm run dev     # Arranca con --watch en http://localhost:3000
-npm test        # Corre la suite completa (Vitest)
+npm test
 npm run test:coverage
 ```
-
-### 2. Frontend
-
-```bash
-cd frontend
-npm install
-npm run dev     # http://localhost:5173
-```
-
-Opcionalmente, crear `frontend/.env` con `VITE_API_URL=http://localhost:3000` si el
-backend corre en otro host/puerto (por defecto apunta a `http://localhost:3000`).
 
 ---
 
