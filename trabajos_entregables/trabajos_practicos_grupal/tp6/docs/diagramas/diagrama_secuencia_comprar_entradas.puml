@@ -1,0 +1,65 @@
+@startuml diagrama_secuencia_comprar_entradas
+title Secuencia — Comprar Entradas (forma de pago: tarjeta)
+
+actor Visitante
+participant "PaginaComprar\n(React)" as UI
+participant "clienteApi" as API
+participant "ComprasController" as Controller
+participant "ComprarEntradas\n(Use Case)" as UseCase
+participant "RepositorioUsuariosJson" as RepoUsuarios
+participant "Compra\n(Entity)" as Compra
+participant "Visitante\n(Entity)" as VisitanteVO
+participant "CalculadoraTarifas" as Calculadora
+participant "GeneradorComprobante" as Comprobante
+participant "ServicioEmailGmail" as Email
+participant "PasarelaDePagoMercadoPago" as MercadoPago
+
+Visitante -> UI: completa fecha, cantidad,\nvisitantes y forma de pago
+UI -> UI: aFormatoBackend(fecha)
+UI -> API: comprarEntradas(datos)
+API -> Controller: POST /api/compras
+
+Controller -> UseCase: ejecutar({usuarioId, fechaVisita,\ncantidadEntradas, visitantes, formaPago})
+
+UseCase -> RepoUsuarios: buscarPorId(usuarioId)
+RepoUsuarios --> UseCase: usuario
+
+alt usuario no registrado
+  UseCase --> Controller: throw UsuarioNoRegistradoError
+  Controller --> UI: 404 { mensaje }
+end
+
+UseCase -> Compra: Compra.crear(datos, hoy)
+Compra -> Compra: FechaVisita.crear(fechaVisita, hoy)
+note right: valida formato, no pasada,\nno lunes, no feriado
+
+Compra -> VisitanteVO: Visitante.crear(datos) (por cada visitante)
+Compra -> Compra: Email.crear(usuario.email)
+
+loop por cada visitante
+  Compra -> VisitanteVO: calcularPrecio()
+  VisitanteVO -> Calculadora: calcularPrecio({edad, tipoPase})
+  Calculadora --> VisitanteVO: precioFinal
+end
+
+Compra --> UseCase: compra (montoTotal calculado)
+
+UseCase -> Comprobante: generarComprobante(compra)
+Comprobante --> UseCase: comprobante
+
+UseCase -> Email: enviarComprobante({email, comprobante})
+Email --> UseCase: ok
+
+alt formaPago === "tarjeta"
+  UseCase -> MercadoPago: crearPreferenciaPago({visitantes, email})
+  MercadoPago --> UseCase: { initPoint, sandboxInitPoint }
+  UseCase --> Controller: { comprobante, pago }
+  Controller --> UI: 201 { comprobante, pago }
+  UI -> Visitante: redirige a pago.initPoint\n(Checkout Pro de Mercado Pago)
+else formaPago === "efectivo"
+  UseCase --> Controller: { comprobante }
+  Controller --> UI: 201 { comprobante }
+  UI -> Visitante: muestra PaginaComprobante
+end
+
+@enduml
