@@ -1,4 +1,4 @@
-const URL_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:3000'
+const URL_BASE = import.meta.env.VITE_API_URL ?? ''
 
 async function peticion (ruta, opciones = {}) {
   const respuesta = await fetch(`${URL_BASE}${ruta}`, {
