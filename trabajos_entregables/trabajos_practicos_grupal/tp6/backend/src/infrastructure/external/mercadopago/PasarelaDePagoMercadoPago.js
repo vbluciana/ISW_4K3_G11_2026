@@ -6,8 +6,12 @@ function capitalizar (texto) {
 }
 
 function esUrlLocal (url) {
-  const { hostname } = new URL(url)
-  return hostname === 'localhost' || hostname === '127.0.0.1'
+  try {
+    const { hostname } = new URL(url)
+    return hostname === 'localhost' || hostname === '127.0.0.1'
+  } catch {
+    return false
+  }
 }
 
 // Adaptador de infraestructura (hexagonal): implementa el puerto PasarelaDePago
@@ -18,7 +22,7 @@ export class PasarelaDePagoMercadoPago extends PasarelaDePago {
     super()
     const cliente = new MercadoPagoConfig({ accessToken })
     this.preference = new Preference(cliente)
-    this.frontendUrl = frontendUrl
+    this.frontendUrl = (frontendUrl ?? 'http://localhost:5173').replace(/\/+$/, '')
   }
 
   async crearPreferenciaPago ({ visitantes, email }) {
@@ -36,16 +40,14 @@ export class PasarelaDePagoMercadoPago extends PasarelaDePago {
         success: `${this.frontendUrl}/pago-exitoso`,
         failure: `${this.frontendUrl}/pago-fallido`,
         pending: `${this.frontendUrl}/pago-pendiente`
-      } , 
-      "auto_return":"approved"
+      }
     }
 
     // Mercado Pago rechaza auto_return si las back_urls apuntan a localhost
-    // (error "invalid_auto_return"), así que en desarrollo local se omite.
-    // if (!esUrlLocal(this.frontendUrl)) {
-      // body.auto_return = 'approved'
-    // }
-
+    // (error "invalid_auto_return"), así que solo se activa en URLs públicas (como Cloudflare Tunnel).
+    if (!esUrlLocal(this.frontendUrl)) {
+      body.auto_return = 'approved'
+    }
 
     const respuesta = await this.preference.create({ body })
 
