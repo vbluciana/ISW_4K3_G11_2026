@@ -1,0 +1,52 @@
+services:
+  cloudflared:
+    build:
+      context: .
+      dockerfile: scripts/cloudflared.Dockerfile
+    volumes:
+      - cloudflared_data:/shared/cloudflared
+    healthcheck:
+      test: ["CMD-SHELL", "test -s /shared/cloudflared/frontend-url.txt"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+      start_period: 2s
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./backend
+    environment:
+      PORT: 3000
+      MERCADOPAGO_ACCESS_TOKEN: ${MERCADOPAGO_ACCESS_TOKEN:-}
+      MERCADOPAGO_PUBLIC_KEY: ${MERCADOPAGO_PUBLIC_KEY:-}
+      SMTP_HOST: ${SMTP_HOST:-smtp.gmail.com}
+      SMTP_PORT: ${SMTP_PORT:-465}
+      SMTP_SECURE: ${SMTP_SECURE:-true}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      FRONTEND_URL: ${FRONTEND_URL:-}
+    ports:
+      - "3000:3000"
+    volumes:
+      - usuarios_data:/app/data
+      - cloudflared_data:/shared/cloudflared:ro
+    depends_on:
+      cloudflared:
+        condition: service_healthy
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+    environment:
+      API_PROXY_TARGET: http://backend:3000
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  usuarios_data:
+  cloudflared_data:
