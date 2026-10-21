@@ -7,7 +7,8 @@ export class Visitante {
   }
 
   static crear ({ edad, tipoPase }) {
-    return new Visitante(edad, (tipoPase ?? '').toLowerCase())
+    const tipoPaseNormalizado = (tipoPase ?? '').toLowerCase()
+    return new Visitante(edad, tipoPaseNormalizado)
   }
 
   calcularPrecio () {
