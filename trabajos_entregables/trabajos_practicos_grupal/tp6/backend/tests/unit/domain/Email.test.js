@@ -15,4 +15,8 @@ describe('Email', () => {
   it('rechaza un email sin arroba', () => {
     expect(() => Email.crear('visitante.ecoharmony.com')).toThrow(EmailInvalidoError)
   })
+
+  it('rechaza un email sin dominio', () => {
+    expect(() => Email.crear('visitante@')).toThrow(EmailInvalidoError)
+  })
 })
