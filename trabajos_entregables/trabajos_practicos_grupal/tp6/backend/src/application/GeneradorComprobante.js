@@ -3,6 +3,10 @@ const FORMATO_MONEDA_ARS = new Intl.NumberFormat('es-AR', {
   currency: 'ARS'
 })
 
+function formatearMoneda (monto) {
+  return FORMATO_MONEDA_ARS.format(monto)
+}
+
 function formatearFecha (cadenaFecha) {
   return (cadenaFecha || '').replace(/-/g, '/')
 }
@@ -14,6 +18,6 @@ export function generarComprobante (compra) {
     cantidadEntradas: compra.cantidadEntradas,
     formaPago: compra.formaPago,
     email: compra.email.valor,
-    montoTotal: FORMATO_MONEDA_ARS.format(compra.montoTotal)
+    montoTotal: formatearMoneda(compra.montoTotal)
   }
 }
