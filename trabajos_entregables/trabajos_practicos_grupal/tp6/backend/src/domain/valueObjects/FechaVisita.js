@@ -1,3 +1,4 @@
+import { DIA_SEMANA_CERRADO } from '../../config/parque.config.js'
 import { FechaVisitaInvalidaError } from '../errors/DomainError.js'
 
 const FORMATO_DD_MM_AAAA = /^(\d{2})-(\d{2})-(\d{4})$/
@@ -38,6 +39,10 @@ export class FechaVisita {
 
     if (iniciarDia(fecha) < iniciarDia(hoy)) {
       throw new FechaVisitaInvalidaError('La fecha de visita no puede ser anterior al día de hoy')
+    }
+
+    if (fecha.getDay() === DIA_SEMANA_CERRADO) {
+      throw new FechaVisitaInvalidaError('El parque permanece cerrado los días lunes')
     }
 
     return new FechaVisita(fechaString)
