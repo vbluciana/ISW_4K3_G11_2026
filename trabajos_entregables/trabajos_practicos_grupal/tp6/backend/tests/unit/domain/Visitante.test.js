@@ -10,4 +10,11 @@ describe('Visitante', () => {
     expect(visitante.tipoPase).toBe('regular')
     expect(visitante.precio).toBe(10000)
   })
+
+  it('normaliza el tipo de pase a minúsculas', () => {
+    const visitante = Visitante.crear({ edad: 30, tipoPase: 'VIP' })
+
+    expect(visitante.tipoPase).toBe('vip')
+    expect(visitante.precio).toBe(20000)
+  })
 })
