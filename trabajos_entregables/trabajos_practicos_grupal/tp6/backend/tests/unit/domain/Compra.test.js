@@ -40,4 +40,9 @@ describe('Compra', () => {
     expect(compra.id).toBeDefined()
     expect(Object.isFrozen(compra)).toBe(true)
   })
+
+  it('normaliza la forma de pago a minúsculas', () => {
+    const compra = Compra.crear(datosValidos({ formaPago: 'TARJETA' }), HOY)
+    expect(compra.formaPago).toBe('tarjeta')
+  })
 })
