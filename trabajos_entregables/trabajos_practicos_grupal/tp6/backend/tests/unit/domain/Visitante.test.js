@@ -50,4 +50,9 @@ describe('Visitante', () => {
     expect(adulto.calcularPrecio()).toBe(10000)
     expect(menor.calcularPrecio()).toBe(5000)
   })
+
+  it('es inmutable con Object.freeze', () => {
+    const visitante = Visitante.crear({ edad: 25, tipoPase: 'regular' })
+    expect(Object.isFrozen(visitante)).toBe(true)
+  })
 })
