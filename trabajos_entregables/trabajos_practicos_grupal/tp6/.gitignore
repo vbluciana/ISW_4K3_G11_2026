@@ -1,0 +1,20 @@
+# Variables de entorno y credenciales sensibles
+.env
+*.env
+.env.*
+!.env.example
+
+# Dependencias
+node_modules/
+*/node_modules/
+
+# Cobertura y reportes
+coverage/
+*/coverage/
+*.log
+
+# Compilación y artefactos
+dist/
+build/
+.DS_Store
+Thumbs.db

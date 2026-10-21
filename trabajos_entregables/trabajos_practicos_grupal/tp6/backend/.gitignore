@@ -1,0 +1,19 @@
+# Variables de entorno y secretos
+.env
+.env.local
+.env.*.local
+*.env
+
+# Dependencias
+node_modules/
+
+# Cobertura y logs
+coverage/
+*.log
+npm-debug.log*
+
+# Builds
+dist/
+build/
+.DS_Store
+Thumbs.db

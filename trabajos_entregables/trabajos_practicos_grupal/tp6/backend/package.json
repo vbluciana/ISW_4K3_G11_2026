@@ -1,0 +1,28 @@
+{
+  "name": "ecoharmony-backend",
+  "version": "1.0.0",
+  "description": "Backend de EcoHarmony Park - TP6 TDD UTN FRC",
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "node scripts/ejecutar-tdd.js",
+    "test:vitest": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "mercadopago": "^2.0.8",
+    "nodemailer": "^6.9.13"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "^1.6.0",
+    "standard": "^17.1.0",
+    "supertest": "^7.0.0",
+    "vitest": "^1.6.0"
+  }
+}

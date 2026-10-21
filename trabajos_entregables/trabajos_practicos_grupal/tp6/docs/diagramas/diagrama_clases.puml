@@ -1,0 +1,179 @@
+@startuml diagrama_clases
+title EcoHarmony Park — Diagrama de Clases (Comprar Entradas)\nArquitectura Hexagonal (Ports & Adapters)
+
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+hide empty members
+
+package "Dominio (src/domain)" {
+
+  class Compra <<Entity (Aggregate Root)>> {
+    - fechaVisita: FechaVisita
+    - visitantes: Visitante[]
+    - formaPago: String
+    - email: Email
+    - montoTotal: Number
+    + {static} crear(datos, hoy): Compra
+  }
+
+  class Visitante <<Entity>> {
+    - edad: Number
+    - tipoPase: String
+    + {static} crear(datos): Visitante
+    + calcularPrecio(): Number
+  }
+
+  class Usuario <<Entity>> {
+    - id: Number
+    - nombre: String
+    - email: Email
+    - password: String
+    + {static} crear(datos): Usuario
+  }
+
+  class FechaVisita <<Value Object>> {
+    - valor: String
+    + {static} crear(fechaString, hoy): FechaVisita
+  }
+
+  class Email <<Value Object>> {
+    - valor: String
+    + {static} crear(valor): Email
+  }
+
+  class CalculadoraTarifas <<Domain Service>> {
+    + {static} calcularPrecio(datos): Number
+  }
+
+  class DomainError <<Error>>
+  class FechaVisitaInvalidaError
+  class CantidadEntradasInvalidaError
+  class VisitanteInvalidoError
+  class FormaPagoInvalidaError
+  class EmailInvalidoError
+  class UsuarioNoRegistradoError
+  class UsuarioYaRegistradoError
+  class CredencialesInvalidasError
+  class PagoRechazadoError
+
+  DomainError <|-- FechaVisitaInvalidaError
+  DomainError <|-- CantidadEntradasInvalidaError
+  DomainError <|-- VisitanteInvalidoError
+  DomainError <|-- FormaPagoInvalidaError
+  DomainError <|-- EmailInvalidoError
+  DomainError <|-- UsuarioNoRegistradoError
+  DomainError <|-- UsuarioYaRegistradoError
+  DomainError <|-- CredencialesInvalidasError
+  DomainError <|-- PagoRechazadoError
+
+  Compra "1" o-- "1..10" Visitante
+  Compra "1" *-- "1" FechaVisita
+  Compra "1" *-- "1" Email
+  Usuario "1" *-- "1" Email
+  Visitante ..> CalculadoraTarifas : delega cálculo\n(Information Expert)
+  Compra ..> FechaVisita : crea
+  Compra ..> Visitante : crea
+}
+
+package "Aplicación (src/application)" {
+
+  interface RepositorioUsuarios <<Port>> {
+    + buscarPorId(id)
+    + buscarPorNombre(nombre)
+    + buscarPorEmail(email)
+    + guardar(usuario)
+  }
+
+  interface PasarelaDePago <<Port>> {
+    + crearPreferenciaPago(datos)
+  }
+
+  interface ServicioEmail <<Port>> {
+    + enviarComprobante(datos)
+  }
+
+  class ComprarEntradas <<Use Case>> {
+    - repositorioUsuarios: RepositorioUsuarios
+    - pasarelaDePago: PasarelaDePago
+    - servicioEmail: ServicioEmail
+    + ejecutar(datos, hoy): Promise
+  }
+
+  class RegistrarUsuario <<Use Case>> {
+    - repositorioUsuarios: RepositorioUsuarios
+    + ejecutar(datos): Promise
+  }
+
+  class Login <<Use Case>> {
+    - repositorioUsuarios: RepositorioUsuarios
+    + ejecutar(datos): Promise
+  }
+
+  class GeneradorComprobante <<Service>> {
+    + generarComprobante(compra): Object
+  }
+
+  ComprarEntradas -down-> RepositorioUsuarios : usa
+  ComprarEntradas -down-> PasarelaDePago : usa
+  ComprarEntradas -down-> ServicioEmail : usa
+  ComprarEntradas ..> Compra : crea (Compra.crear)
+  ComprarEntradas ..> GeneradorComprobante : usa
+  RegistrarUsuario -down-> RepositorioUsuarios : usa
+  RegistrarUsuario ..> Usuario : crea (Usuario.crear)
+  Login -down-> RepositorioUsuarios : usa
+}
+
+package "Infraestructura (src/infrastructure)" {
+
+  class ComprasController <<Controller>> {
+    - comprarEntradas: ComprarEntradas
+    + comprar(req, res, next)
+  }
+
+  class UsuariosController <<Controller>> {
+    - registrarUsuario: RegistrarUsuario
+    - login: Login
+    + registrar(req, res, next)
+    + iniciarSesion(req, res, next)
+  }
+
+  class RepositorioUsuariosJson <<Adapter>> {
+    - rutaArchivo: String
+    + buscarPorId(id)
+    + buscarPorNombre(nombre)
+    + buscarPorEmail(email)
+    + guardar(usuario)
+  }
+
+  class PasarelaDePagoMercadoPago <<Adapter>> {
+    - accessToken: String
+    - frontendUrl: String
+    + crearPreferenciaPago(datos)
+  }
+
+  class ServicioEmailGmail <<Adapter>> {
+    - transportador: Transporter
+    + enviarComprobante(datos)
+  }
+
+  class manejadorErrores <<Middleware>>
+
+  RepositorioUsuariosJson .up.|> RepositorioUsuarios : implementa
+  PasarelaDePagoMercadoPago .up.|> PasarelaDePago : implementa
+  ServicioEmailGmail .up.|> ServicioEmail : implementa
+
+  ComprasController -down-> ComprarEntradas : invoca
+  UsuariosController -down-> RegistrarUsuario : invoca
+  UsuariosController -down-> Login : invoca
+}
+
+note right of RepositorioUsuariosJson
+  **Dependency Inversion**: el dominio y la
+  aplicación dependen de las interfaces
+  (ports), nunca de los adaptadores
+  concretos. La composición se arma en
+  src/infrastructure/http/app.js (crearApp)
+  y src/server.js (composition root).
+end note
+
+@enduml
