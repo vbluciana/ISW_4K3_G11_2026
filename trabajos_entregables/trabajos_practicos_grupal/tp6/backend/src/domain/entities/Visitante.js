@@ -9,9 +9,8 @@ export class Visitante {
   }
 
   static crear ({ edad, tipoPase }) {
-    // Rango inclusivo
     if (edad < LIMITES_EDAD.MIN || edad > LIMITES_EDAD.MAX) {
-      throw new VisitanteInvalidoError(`La edad debe estar entre ${LIMITES_EDAD.MIN} y ${LIMITES_EDAD.MAX}`)
+      throw new VisitanteInvalidoError(`La edad debe ser un entero entre ${LIMITES_EDAD.MIN} y ${LIMITES_EDAD.MAX}`)
     }
     const tipoPaseNormalizado = (tipoPase ?? '').toLowerCase()
     return new Visitante(edad, tipoPaseNormalizado)
