@@ -11,4 +11,8 @@ describe('FechaVisita', () => {
 
     expect(fechaVisita.valor).toBe('20-10-2026')
   })
+
+  it('rechaza formatos que no sean dd-mm-aaaa', () => {
+    expect(() => FechaVisita.crear('2026-10-20', HOY)).toThrow(FechaVisitaInvalidaError)
+  })
 })
