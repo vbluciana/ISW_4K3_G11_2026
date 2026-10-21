@@ -52,6 +52,10 @@ export class FechaVisita {
       throw new FechaVisitaInvalidaError('El parque permanece cerrado los días lunes')
     }
 
+    if (dia === 25 && mes === 12) {
+      throw new FechaVisitaInvalidaError('El parque permanece cerrado en esa fecha por feriado')
+    }
+
     return new FechaVisita(fechaString)
   }
 }
