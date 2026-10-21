@@ -1,5 +1,9 @@
+function formatearFecha (cadenaFecha) {
+  return cadenaFecha.replace(/-/g, '/')
+}
+
 export function generarComprobante (compra) {
   return {
-    fechaVisita: compra.fechaVisita.valor.replace(/-/g, '/')
+    fechaVisita: formatearFecha(compra.fechaVisita.valor)
   }
 }
