@@ -51,4 +51,19 @@ describe('ComprarEntradas', () => {
     expect(pasarelaDePago.llamadas).toHaveLength(0)
     expect(servicioEmail.enviados).toHaveLength(0)
   })
+
+  it('completa una compra en efectivo: persiste la compra, envía email y retorna comprobante', async () => {
+    const resultado = await casoDeUso.ejecutar(datosValidos(), HOY)
+
+    expect(resultado.comprobante).toBeDefined()
+    expect(resultado.comprobante.montoTotal).toBe(15000)
+    expect(resultado.comprobante.formaPago).toBe('efectivo')
+    expect(resultado.comprobante.estado).toBe('PENDIENTE_PAGO_BOLETERIA')
+    expect(resultado.pago).toBeUndefined()
+
+    expect(await repositorioCompras.listarTodas()).toHaveLength(1)
+    expect(pasarelaDePago.llamadas).toHaveLength(0)
+    expect(servicioEmail.enviados).toHaveLength(1)
+    expect(servicioEmail.enviados[0].email).toBe('ana@ecoharmony.com')
+  })
 })
