@@ -22,4 +22,10 @@ describe('generadorComprobante', () => {
   it('convierte la fecha de visita a formato dd/mm/aaaa', () => {
     expect(comprobante.fechaVisita).toBe('20/10/2026')
   })
+
+  it('informa la cantidad de entradas y la forma de pago', () => {
+    expect(comprobante.cantidadEntradas).toBe(2)
+    expect(comprobante.formaPago).toBe('efectivo')
+    expect(comprobante.email).toBe('visitante@ecoharmony.com')
+  })
 })
