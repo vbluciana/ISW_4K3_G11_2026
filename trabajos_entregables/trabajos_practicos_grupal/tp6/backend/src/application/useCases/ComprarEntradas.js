@@ -59,7 +59,6 @@ export class ComprarEntradas {
     try {
       return await this.#pasarelaDePago.crearPreferenciaPago({
         compra,
-        email: compra.email.valor,
         visitantes: compra.visitantes,
         montoTotal: compra.montoTotal,
         frontendUrl

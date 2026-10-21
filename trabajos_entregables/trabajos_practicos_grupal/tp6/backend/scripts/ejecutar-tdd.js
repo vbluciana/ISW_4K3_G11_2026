@@ -30,7 +30,7 @@ child.on('close', code => {
 
   if (code === 0) {
     console.log('   • Estado de la Suite:       100% EN VERDE (TODAS LAS PRUEBAS APROBADAS ✓)')
-    console.log('   • Total de Casos de Prueba: 68 pruebas ejecutadas exitosamente')
+    console.log('   • Total de Casos de Prueba: Todas las pruebas ejecutadas exitosamente')
     console.log('   • Cobertura de Dominio:     100% de reglas de negocio cubiertas')
     console.log('   • Arquitectura:             Hexagonal limpia (Dominio aislado de frameworks)')
     console.log('   • Integraciones externas:   Gmail SMTP Real • Mercado Pago Checkout Pro Sandbox')

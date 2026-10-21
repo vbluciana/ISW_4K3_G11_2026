@@ -17,7 +17,7 @@ export class PasarelaDePagoMercadoPago extends PasarelaDePago {
 
   async crearPreferenciaPago ({ compra, visitantes, email, frontendUrl } = {}) {
     const listaVisitantes = visitantes || (compra ? compra.visitantes : [])
-    const emailPayer = email || (compra ? (compra.email?.valor || compra.email) : '')
+    const emailPayer = email || ''
     const idCompra = compra?.id
     const queryReserva = idCompra ? `?reserva=${idCompra}` : ''
 
@@ -35,12 +35,15 @@ export class PasarelaDePagoMercadoPago extends PasarelaDePago {
 
     const body = {
       items,
-      payer: { email: emailPayer },
       back_urls: {
         success: `${urlRetorno}/pago-exitoso${queryReserva}`,
         failure: `${urlRetorno}/pago-fallido${queryReserva}`,
         pending: `${urlRetorno}/pago-pendiente${queryReserva}`
       }
+    }
+
+    if (emailPayer) {
+      body.payer = { email: emailPayer }
     }
 
     if (idCompra) {
@@ -55,7 +58,7 @@ export class PasarelaDePagoMercadoPago extends PasarelaDePago {
 
     return {
       id: respuesta.id,
-      initPoint: respuesta.init_point,
+      initPoint: respuesta.sandbox_init_point || respuesta.init_point,
       sandboxInitPoint: respuesta.sandbox_init_point
     }
   }

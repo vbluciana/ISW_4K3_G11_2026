@@ -56,9 +56,24 @@ describe('PasarelaDePagoMercadoPago', () => {
     expect(argumento.body.auto_return).toBe('approved')
     expect(resultado).toEqual({
       id: 'pref-123456',
-      initPoint: 'https://www.mercadopago.com.ar/checkout/v1/redirect?pref_id=123',
+      initPoint: 'https://sandbox.mercadopago.com.ar/checkout/v1/redirect?pref_id=123',
       sandboxInitPoint: 'https://sandbox.mercadopago.com.ar/checkout/v1/redirect?pref_id=123'
     })
+  })
+
+  it('no incluye objeto payer si no se especifica email para permitir checkout de invitado sin conflicto', async () => {
+    preferenceCreateMock.mockResolvedValue({
+      id: 'pref-guest-123',
+      init_point: 'https://www.mercadopago.com.ar/checkout/v1/redirect?pref_id=guest',
+      sandbox_init_point: 'https://sandbox.mercadopago.com.ar/checkout/v1/redirect?pref_id=guest'
+    })
+
+    const visitantes = [Visitante.crear({ edad: 30, tipoPase: 'regular' })]
+
+    await pasarela.crearPreferenciaPago({ visitantes })
+
+    const [argumento] = preferenceCreateMock.mock.calls[0]
+    expect(argumento.body.payer).toBeUndefined()
   })
 
   it('propaga el error si Mercado Pago rechaza la creación de la preferencia', async () => {
