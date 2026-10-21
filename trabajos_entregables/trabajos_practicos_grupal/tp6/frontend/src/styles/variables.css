@@ -1,0 +1,21 @@
+:root {
+  --color-verde-oscuro: #386641;
+  --color-verde-medio: #6a994e;
+  --color-verde-claro: #a7c957;
+  --color-crema: #f2e8cf;
+  --color-rojo: #bc4749;
+
+  --color-texto: var(--color-verde-oscuro);
+  --color-fondo: var(--color-crema);
+  --color-superficie: #ffffff;
+
+  --fuente-principal: 'Lato', Arial, sans-serif;
+
+  --espaciado-xs: 0.25rem;
+  --espaciado-sm: 0.5rem;
+  --espaciado-md: 1rem;
+  --espaciado-lg: 1.5rem;
+  --espaciado-xl: 2.5rem;
+
+  --radio-borde: 10px;
+}
