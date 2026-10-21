@@ -28,4 +28,9 @@ describe('FechaVisita', () => {
   it('rechaza fechas anteriores al día de hoy', () => {
     expect(() => FechaVisita.crear('16-10-2026', HOY)).toThrow('La fecha de visita no puede ser anterior al día de hoy')
   })
+
+  it('rechaza una fecha pasada aunque caiga un día lunes con el error de fecha anterior', () => {
+    // 12-10-2026 fue lunes anterior a HOY (17-10-2026)
+    expect(() => FechaVisita.crear('12-10-2026', HOY)).toThrow('La fecha de visita no puede ser anterior al día de hoy')
+  })
 })
