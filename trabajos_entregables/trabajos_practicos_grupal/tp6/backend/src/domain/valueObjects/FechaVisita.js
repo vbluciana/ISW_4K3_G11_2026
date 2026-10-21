@@ -1,8 +1,8 @@
 export class FechaVisita {
   constructor (valor) {
-    this.valor = valor
+    this.valor = (valor || '').trim()
   }
-  static crear (valor) {
-    return new FechaVisita(valor)
+  static crear (cadenaFecha) {
+    return new FechaVisita(cadenaFecha)
   }
 }
