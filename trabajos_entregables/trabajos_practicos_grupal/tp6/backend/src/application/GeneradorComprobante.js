@@ -4,6 +4,9 @@ function formatearFecha (cadenaFecha) {
 
 export function generarComprobante (compra) {
   return {
-    fechaVisita: formatearFecha(compra.fechaVisita.valor)
+    fechaVisita: formatearFecha(compra.fechaVisita.valor),
+    cantidadEntradas: compra.cantidadEntradas,
+    formaPago: compra.formaPago,
+    email: compra.email.valor
   }
 }
