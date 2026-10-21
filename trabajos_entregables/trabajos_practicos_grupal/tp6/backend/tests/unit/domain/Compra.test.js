@@ -75,4 +75,9 @@ describe('Compra', () => {
     expect(() => Compra.crear(datosValidos({ visitantes: visitantesInvalidos }), HOY))
       .toThrow(VisitanteInvalidoError)
   })
+
+  it('rechaza formas de pago no soportadas', () => {
+    expect(() => Compra.crear(datosValidos({ formaPago: 'cripto' }), HOY))
+      .toThrow(FormaPagoInvalidaError)
+  })
 })
