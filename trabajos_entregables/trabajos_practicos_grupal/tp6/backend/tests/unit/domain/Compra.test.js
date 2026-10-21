@@ -85,4 +85,16 @@ describe('Compra', () => {
     expect(() => Compra.crear(datosValidos({ email: 'correo-invalido' }), HOY))
       .toThrow(EmailInvalidoError)
   })
+
+  it('toJSON serializa correctamente las entidades hijas', () => {
+    const compra = Compra.crear(datosValidos(), HOY)
+    const json = compra.toJSON()
+
+    expect(json.id).toBe(compra.id)
+    expect(json.fechaVisita).toBe('20-10-2026')
+    expect(json.visitantes[0]).toEqual({ edad: 30, tipoPase: 'regular', precio: 10000 })
+    expect(json.visitantes[1]).toEqual({ edad: 10, tipoPase: 'regular', precio: 5000 })
+    expect(json.montoTotal).toBe(15000)
+    expect(json.fechaCreacion).toBeDefined()
+  })
 })
