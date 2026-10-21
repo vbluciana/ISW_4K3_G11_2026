@@ -1,4 +1,5 @@
 import { CalculadoraTarifas } from '../services/CalculadoraTarifas.js'
+import { VisitanteInvalidoError } from '../errors/DomainError.js'
 
 export class Visitante {
   constructor (edad, tipoPase) {
@@ -7,6 +8,9 @@ export class Visitante {
   }
 
   static crear ({ edad, tipoPase }) {
+    if (edad < 0) {
+      throw new VisitanteInvalidoError('La edad no puede ser menor a 0')
+    }
     const tipoPaseNormalizado = (tipoPase ?? '').toLowerCase()
     return new Visitante(edad, tipoPaseNormalizado)
   }
