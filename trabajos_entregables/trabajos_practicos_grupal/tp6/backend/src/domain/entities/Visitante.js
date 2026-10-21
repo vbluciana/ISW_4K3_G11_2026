@@ -1,3 +1,4 @@
+import { LIMITES_EDAD } from '../../config/parque.config.js'
 import { CalculadoraTarifas } from '../services/CalculadoraTarifas.js'
 import { VisitanteInvalidoError } from '../errors/DomainError.js'
 
@@ -8,8 +9,8 @@ export class Visitante {
   }
 
   static crear ({ edad, tipoPase }) {
-    if (edad < 0) {
-      throw new VisitanteInvalidoError('La edad no puede ser menor a 0')
+    if (edad < LIMITES_EDAD.MIN) {
+      throw new VisitanteInvalidoError(`La edad debe ser mayor o igual a ${LIMITES_EDAD.MIN}`)
     }
     const tipoPaseNormalizado = (tipoPase ?? '').toLowerCase()
     return new Visitante(edad, tipoPaseNormalizado)
