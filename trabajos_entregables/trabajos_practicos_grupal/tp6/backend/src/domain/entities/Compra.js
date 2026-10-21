@@ -8,25 +8,44 @@ import {
   CANTIDAD_MAXIMA_ENTRADAS
 } from '../../config/parque.config.js'
 
+function validarCantidadEntradas (cantidad, visitantes) {
+  if (
+    typeof cantidad !== 'number' ||
+    cantidad < CANTIDAD_MINIMA_ENTRADAS ||
+    cantidad > CANTIDAD_MAXIMA_ENTRADAS
+  ) {
+    throw new CantidadEntradasInvalidaError(
+      `La cantidad de entradas debe estar entre ${CANTIDAD_MINIMA_ENTRADAS} y ${CANTIDAD_MAXIMA_ENTRADAS}`
+    )
+  }
+
+  if (!Array.isArray(visitantes) || visitantes.length !== cantidad) {
+    throw new CantidadEntradasInvalidaError(
+      `La cantidad de entradas (${cantidad}) no coincide con la cantidad de visitantes registrados (${visitantes?.length ?? 0})`
+    )
+  }
+}
+
 export class Compra {
-  constructor (params) {
-    Object.assign(this, params)
-    this.id = params.id || crypto.randomUUID()
-    this.emailComprador = params.email.valor
+  constructor ({ id, nombreComprador, fechaVisita, email, visitantes, formaPago, cantidadEntradas, montoTotal, fechaCreacion }) {
+    this.id = id || crypto.randomUUID()
+    this.nombreComprador = (nombreComprador || '').trim()
+    this.fechaVisita = fechaVisita
+    this.email = email
+    this.emailComprador = email.valor
+    this.visitantes = Object.freeze([...visitantes])
+    this.formaPago = (formaPago || '').toLowerCase()
+    this.cantidadEntradas = cantidadEntradas
+    this.montoTotal = montoTotal
+    this.fechaCreacion = fechaCreacion || new Date()
     Object.freeze(this)
   }
 
   static crear (datos, hoy = new Date()) {
-    if (datos.cantidadEntradas < CANTIDAD_MINIMA_ENTRADAS || datos.cantidadEntradas > CANTIDAD_MAXIMA_ENTRADAS) {
-      throw new CantidadEntradasInvalidaError('Cantidad fuera de rango')
-    }
-    const visitantes = datos.visitantes || []
-    if (visitantes.length !== datos.cantidadEntradas) {
-      throw new CantidadEntradasInvalidaError('La cantidad de visitantes debe coincidir con la cantidad de entradas')
-    }
+    validarCantidadEntradas(datos.cantidadEntradas, datos.visitantes)
     const fechaVO = FechaVisita.crear(datos.fechaVisita, hoy)
     const emailVO = Email.crear(datos.email || datos.emailComprador)
-    const listaVisitantes = visitantes.map(v => Visitante.crear(v))
+    const listaVisitantes = (datos.visitantes || []).map(v => Visitante.crear(v))
     const total = listaVisitantes.reduce((sum, v) => sum + v.precio, 0)
 
     return new Compra({
@@ -34,7 +53,7 @@ export class Compra {
       fechaVisita: fechaVO,
       email: emailVO,
       visitantes: listaVisitantes,
-      formaPago: (datos.formaPago || '').toLowerCase(),
+      formaPago: datos.formaPago,
       cantidadEntradas: datos.cantidadEntradas,
       montoTotal: total
     })
