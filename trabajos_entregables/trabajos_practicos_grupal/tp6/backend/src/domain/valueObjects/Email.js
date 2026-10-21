@@ -1,5 +1,7 @@
 import { EmailInvalidoError } from '../errors/DomainError.js'
 
+const FORMATO_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
 export class Email {
   constructor (valor) {
     this.valor = valor
@@ -7,14 +9,10 @@ export class Email {
   }
 
   static crear (valor) {
-    const cadena = String(valor ?? '')
-    if (cadena.includes(' ')) {
+    if (!FORMATO_EMAIL.test(valor ?? '')) {
       throw new EmailInvalidoError('El email ingresado no tiene un formato válido')
     }
-    const partes = cadena.split('@')
-    if (partes.length !== 2 || !partes[0] || !partes[1] || !partes[1].includes('.')) {
-      throw new EmailInvalidoError('El email ingresado no tiene un formato válido')
-    }
+
     return new Email(valor)
   }
 }
