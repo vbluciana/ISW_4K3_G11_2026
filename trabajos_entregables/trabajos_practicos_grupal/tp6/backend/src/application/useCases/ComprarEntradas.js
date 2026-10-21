@@ -13,23 +13,31 @@ export class ComprarEntradas {
   }
 
   async ejecutar (datos, fechaReferencia = new Date()) {
-    const compra = Compra.crear(datos, fechaReferencia)
+    // 1. Instanciar y validar el agregado Compra y todas sus entidades/VOs
+    const compra = Compra.crear({
+      nombreComprador: datos.nombreComprador,
+      emailComprador: datos.emailComprador || datos.email,
+      fechaVisita: datos.fechaVisita,
+      cantidadEntradas: datos.cantidadEntradas,
+      visitantes: datos.visitantes,
+      formaPago: datos.formaPago
+    }, fechaReferencia)
 
+    // 2. Procesar pago con pasarela externa si la forma de pago es tarjeta
     let pago = null
     if (compra.formaPago === 'tarjeta') {
-      try {
-        pago = await this.#procesarPagoTarjeta(compra)
-      } catch (err) {
-        throw err
-      }
+      pago = await this.#procesarPagoTarjeta(compra)
     }
 
+    // 3. Persistir compra en repositorio
     if (this.#repositorioCompras) {
       await this.#repositorioCompras.guardar(compra)
     }
 
+    // 4. Armar el comprobante
     const comprobante = this.#armarComprobante(compra, pago)
 
+    // 5. Enviar comprobante por email si es compra presencial en efectivo
     if (compra.formaPago === 'efectivo' && this.#servicioEmail) {
       await this.#servicioEmail.enviarComprobante({
         email: compra.email.valor,
@@ -37,22 +45,33 @@ export class ComprarEntradas {
       })
     }
 
-    return { comprobante, pago: pago || undefined }
+    return {
+      comprobante,
+      pago: pago || undefined
+    }
   }
 
   async #procesarPagoTarjeta (compra) {
     if (!this.#pasarelaDePago) {
       throw new PagoRechazadoError('Pasarela de pago no configurada')
     }
-    return await this.#pasarelaDePago.crearPreferenciaPago({
-      compra,
-      email: compra.email.valor,
-      visitantes: compra.visitantes,
-      montoTotal: compra.montoTotal
-    })
+
+    try {
+      return await this.#pasarelaDePago.crearPreferenciaPago({
+        compra,
+        email: compra.email.valor,
+        visitantes: compra.visitantes,
+        montoTotal: compra.montoTotal
+      })
+    } catch (error) {
+      if (error instanceof PagoRechazadoError) {
+        throw error
+      }
+      throw new PagoRechazadoError(`Error al procesar el pago: ${error.message}`)
+    }
   }
 
-  #armarComprobante (compra, pago = null) {
+  #armarComprobante (compra, pago) {
     return {
       idReserva: compra.id,
       nombreComprador: compra.nombreComprador,
