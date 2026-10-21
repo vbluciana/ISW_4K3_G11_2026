@@ -33,4 +33,8 @@ describe('Visitante', () => {
     expect(bebe.edad).toBe(0)
     expect(centenario.edad).toBe(100)
   })
+
+  it('rechaza una edad no entera', () => {
+    expect(() => Visitante.crear({ edad: 30.5, tipoPase: 'regular' })).toThrow(VisitanteInvalidoError)
+  })
 })
