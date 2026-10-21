@@ -8,6 +8,7 @@ export class Visitante {
   constructor (edad, tipoPase) {
     this.edad = edad
     this.tipoPase = tipoPase
+    Object.freeze(this)
   }
 
   static crear ({ edad, tipoPase }) {
@@ -29,5 +30,13 @@ export class Visitante {
 
   get precio () {
     return this.calcularPrecio()
+  }
+
+  toJSON () {
+    return {
+      edad: this.edad,
+      tipoPase: this.tipoPase,
+      precio: this.precio
+    }
   }
 }
