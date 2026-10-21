@@ -25,4 +25,12 @@ describe('Visitante', () => {
   it('rechaza una edad mayor a 100 años (> 100)', () => {
     expect(() => Visitante.crear({ edad: 101, tipoPase: 'regular' })).toThrow(VisitanteInvalidoError)
   })
+
+  it('acepta los límites exactos de edad: 0 y 100 años', () => {
+    const bebe = Visitante.crear({ edad: 0, tipoPase: 'regular' })
+    const centenario = Visitante.crear({ edad: 100, tipoPase: 'regular' })
+
+    expect(bebe.edad).toBe(0)
+    expect(centenario.edad).toBe(100)
+  })
 })
