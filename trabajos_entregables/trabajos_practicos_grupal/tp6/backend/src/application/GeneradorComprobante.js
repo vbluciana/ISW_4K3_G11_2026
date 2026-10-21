@@ -3,6 +3,11 @@ const FORMATO_MONEDA_ARS = new Intl.NumberFormat('es-AR', {
   currency: 'ARS'
 })
 
+function capitalizar (texto) {
+  if (!texto) return ''
+  return texto.charAt(0).toUpperCase() + texto.slice(1).toLowerCase()
+}
+
 function formatearMoneda (monto) {
   return FORMATO_MONEDA_ARS.format(monto)
 }
@@ -12,11 +17,11 @@ function formatearFecha (cadenaFecha) {
 }
 
 export function generarComprobante (compra) {
-  const detalleEntradas = compra.visitantes.map((v, i) => ({
-    numero: i + 1,
-    edad: v.edad,
-    tipoPase: v.tipoPase.charAt(0).toUpperCase() + v.tipoPase.slice(1),
-    precioFinal: formatearMoneda(v.precio)
+  const detalleEntradas = compra.visitantes.map((visitante, indice) => ({
+    numero: indice + 1,
+    edad: visitante.edad,
+    tipoPase: capitalizar(visitante.tipoPase),
+    precioFinal: formatearMoneda(visitante.precio)
   }))
 
   return {
