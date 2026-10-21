@@ -23,9 +23,9 @@ export class ComprarEntradas {
       formaPago: datos.formaPago
     }, fechaReferencia)
 
-    // 2. Procesar pago con pasarela externa si la forma de pago es tarjeta
+    // 2. Procesar pago con pasarela externa si la forma de pago es tarjeta y el monto es mayor a 0
     let pago = null
-    if (compra.formaPago === 'tarjeta') {
+    if (compra.formaPago === 'tarjeta' && compra.montoTotal > 0) {
       pago = await this.#procesarPagoTarjeta(compra, datos.frontendUrl)
     }
 
@@ -37,8 +37,8 @@ export class ComprarEntradas {
     // 4. Armar el comprobante
     const comprobante = this.#armarComprobante(compra, pago)
 
-    // 5. Enviar comprobante por email si es compra presencial en efectivo
-    if (compra.formaPago === 'efectivo' && this.#servicioEmail) {
+    // 5. Enviar comprobante por email si es compra en efectivo o sin cargo ($0)
+    if ((compra.formaPago === 'efectivo' || compra.montoTotal === 0) && this.#servicioEmail) {
       await this.#servicioEmail.enviarComprobante({
         email: compra.email.valor,
         comprobante
@@ -82,7 +82,11 @@ export class ComprarEntradas {
       visitantes: compra.visitantes.map(v => (typeof v.toJSON === 'function' ? v.toJSON() : v)),
       formaPago: compra.formaPago,
       montoTotal: compra.montoTotal,
-      estado: compra.formaPago === 'efectivo' ? 'PENDIENTE_PAGO_BOLETERIA' : 'PREFERENCIA_PAGO_GENERADA',
+      estado: compra.montoTotal === 0
+        ? 'CONFIRMADO_SIN_CARGO'
+        : compra.formaPago === 'efectivo'
+          ? 'PENDIENTE_PAGO_BOLETERIA'
+          : 'PREFERENCIA_PAGO_GENERADA',
       fechaEmision: new Date().toISOString()
     }
   }

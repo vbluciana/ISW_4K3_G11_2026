@@ -186,7 +186,7 @@ export function PaginaComprar ({ onCompraRealizada, formaPagoInicial, errorInici
         formaPago
       })
 
-      if (formaPago === 'tarjeta' && (resultado.pago?.sandboxInitPoint || resultado.pago?.initPoint)) {
+      if (formaPago === 'tarjeta' && montoTotal > 0 && (resultado.pago?.sandboxInitPoint || resultado.pago?.initPoint)) {
         try {
           sessionStorage.setItem('ecoharmony_ultima_compra', JSON.stringify(resultado.comprobante))
           sessionStorage.setItem('ecoharmony_id_reserva', resultado.comprobante.idReserva)
