@@ -19,7 +19,6 @@ export class Compra {
   }
 
   static crear (datos, hoy = new Date()) {
-    // Al delegar en FechaVisita.crear(datos.fechaVisita, hoy) se propaga FechaVisitaInvalidaError
     const fechaVO = FechaVisita.crear(datos.fechaVisita, hoy)
     const emailVO = Email.crear(datos.email || datos.emailComprador)
     const listaVisitantes = (datos.visitantes || []).map(v => Visitante.crear(v))
