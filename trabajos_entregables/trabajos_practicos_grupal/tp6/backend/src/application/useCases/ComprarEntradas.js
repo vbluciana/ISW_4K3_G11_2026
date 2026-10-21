@@ -14,20 +14,30 @@ export class ComprarEntradas {
   async ejecutar (datos, fechaReferencia = new Date()) {
     const compra = Compra.crear(datos, fechaReferencia)
 
+    let pago = null
+    if (compra.formaPago === 'tarjeta' && this.#pasarelaDePago) {
+      pago = await this.#pasarelaDePago.crearPreferenciaPago({
+        compra,
+        email: compra.email.valor,
+        visitantes: compra.visitantes,
+        montoTotal: compra.montoTotal
+      })
+    }
+
     if (this.#repositorioCompras) {
       await this.#repositorioCompras.guardar(compra)
     }
 
-    const comprobante = this.#armarComprobante(compra)
+    const comprobante = this.#armarComprobante(compra, pago)
 
-    if (this.#servicioEmail) {
+    if (compra.formaPago === 'efectivo' && this.#servicioEmail) {
       await this.#servicioEmail.enviarComprobante({
         email: compra.email.valor,
         comprobante
       })
     }
 
-    return { comprobante }
+    return { comprobante, pago: pago || undefined }
   }
 
   #armarComprobante (compra, pago = null) {
