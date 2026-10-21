@@ -4,20 +4,34 @@ import { Visitante } from './Visitante.js'
 import { Email } from '../valueObjects/Email.js'
 
 export class Compra {
-  constructor (datos) {
-    this.id = crypto.randomUUID()
-    this.nombreComprador = datos.nombreComprador
-    this.fechaVisita = FechaVisita.crear(datos.fechaVisita)
-    this.email = Email.crear(datos.email)
-    this.emailComprador = this.email.valor
-    this.visitantes = (datos.visitantes || []).map(v => Visitante.crear(v))
-    this.formaPago = datos.formaPago
-    this.cantidadEntradas = datos.cantidadEntradas
-    this.montoTotal = this.visitantes.reduce((sum, v) => sum + v.precio, 0)
-    this.fechaCreacion = new Date()
+  constructor ({ id, nombreComprador, fechaVisita, email, visitantes, formaPago, cantidadEntradas, montoTotal, fechaCreacion }) {
+    this.id = id || crypto.randomUUID()
+    this.nombreComprador = (nombreComprador || '').trim()
+    this.fechaVisita = fechaVisita
+    this.email = email
+    this.emailComprador = email.valor
+    this.visitantes = Object.freeze([...visitantes])
+    this.formaPago = formaPago
+    this.cantidadEntradas = cantidadEntradas
+    this.montoTotal = montoTotal
+    this.fechaCreacion = fechaCreacion || new Date()
     Object.freeze(this)
   }
-  static crear (datos) {
-    return new Compra(datos)
+
+  static crear (datos, hoy = new Date()) {
+    const fechaVO = FechaVisita.crear(datos.fechaVisita, hoy)
+    const emailVO = Email.crear(datos.email || datos.emailComprador)
+    const listaVisitantes = (datos.visitantes || []).map(v => Visitante.crear(v))
+    const total = listaVisitantes.reduce((sum, v) => sum + v.precio, 0)
+
+    return new Compra({
+      nombreComprador: datos.nombreComprador,
+      fechaVisita: fechaVO,
+      email: emailVO,
+      visitantes: listaVisitantes,
+      formaPago: datos.formaPago,
+      cantidadEntradas: datos.cantidadEntradas,
+      montoTotal: total
+    })
   }
 }
