@@ -37,4 +37,9 @@ describe('Visitante', () => {
   it('rechaza una edad no entera', () => {
     expect(() => Visitante.crear({ edad: 30.5, tipoPase: 'regular' })).toThrow(VisitanteInvalidoError)
   })
+
+  it('rechaza un tipo de pase inválido', () => {
+    expect(() => Visitante.crear({ edad: 30, tipoPase: 'premium' }))
+      .toThrow(VisitanteInvalidoError)
+  })
 })
