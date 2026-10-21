@@ -50,4 +50,9 @@ describe('Compra', () => {
     expect(() => Compra.crear(datosValidos({ fechaVisita: '19-10-2026' }), HOY))
       .toThrow(FechaVisitaInvalidaError)
   })
+
+  it('rechaza cantidad de entradas menor a 1', () => {
+    expect(() => Compra.crear(datosValidos({ cantidadEntradas: 0, visitantes: [] }), HOY))
+      .toThrow(CantidadEntradasInvalidaError)
+  })
 })
