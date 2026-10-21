@@ -7,7 +7,7 @@ export class Visitante {
   }
 
   static crear ({ edad, tipoPase }) {
-    return new Visitante(edad, tipoPase)
+    return new Visitante(edad, (tipoPase ?? '').toLowerCase())
   }
 
   calcularPrecio () {
