@@ -13,10 +13,25 @@ export class ComprarEntradas {
 
   async ejecutar (datos, fechaReferencia = new Date()) {
     const compra = Compra.crear(datos, fechaReferencia)
+
     if (this.#repositorioCompras) {
       await this.#repositorioCompras.guardar(compra)
     }
-    const comprobante = {
+
+    const comprobante = this.#armarComprobante(compra)
+
+    if (this.#servicioEmail) {
+      await this.#servicioEmail.enviarComprobante({
+        email: compra.email.valor,
+        comprobante
+      })
+    }
+
+    return { comprobante }
+  }
+
+  #armarComprobante (compra, pago = null) {
+    return {
       idReserva: compra.id,
       nombreComprador: compra.nombreComprador,
       emailComprador: compra.email.valor,
@@ -25,12 +40,8 @@ export class ComprarEntradas {
       visitantes: compra.visitantes.map(v => (typeof v.toJSON === 'function' ? v.toJSON() : v)),
       formaPago: compra.formaPago,
       montoTotal: compra.montoTotal,
-      estado: 'PENDIENTE_PAGO_BOLETERIA',
+      estado: compra.formaPago === 'efectivo' ? 'PENDIENTE_PAGO_BOLETERIA' : 'PREFERENCIA_PAGO_GENERADA',
       fechaEmision: new Date().toISOString()
     }
-    if (this.#servicioEmail) {
-      await this.#servicioEmail.enviarComprobante({ email: compra.email.valor, comprobante })
-    }
-    return { comprobante }
   }
 }
