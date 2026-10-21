@@ -15,4 +15,9 @@ describe('CalculadoraTarifas', () => {
     expect(CalculadoraTarifas.calcularPrecio({ edad: 3, tipoPase: 'regular' })).toBe(0)
     expect(CalculadoraTarifas.calcularPrecio({ edad: 0, tipoPase: 'vip' })).toBe(0)
   })
+
+  it('aplica 50% de descuento a un menor de entre 4 y 15 años', () => {
+    expect(CalculadoraTarifas.calcularPrecio({ edad: 15, tipoPase: 'regular' })).toBe(5000)
+    expect(CalculadoraTarifas.calcularPrecio({ edad: 4, tipoPase: 'vip' })).toBe(10000)
+  })
 })
