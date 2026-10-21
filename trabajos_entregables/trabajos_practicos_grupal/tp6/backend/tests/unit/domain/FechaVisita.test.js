@@ -50,4 +50,9 @@ describe('FechaVisita', () => {
     // Desde el 17-10-2026, el 25-11-2026 supera los 30 días.
     expect(() => FechaVisita.crear('25-11-2026', HOY)).toThrow(FechaVisitaInvalidaError)
   })
+
+  it('rechaza el 25 de diciembre por ser feriado de cierre', () => {
+    const fechaRefDiciembre = new Date(2026, 11, 1)
+    expect(() => FechaVisita.crear('25-12-2026', fechaRefDiciembre)).toThrow(FechaVisitaInvalidaError)
+  })
 })
