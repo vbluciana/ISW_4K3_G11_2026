@@ -13,6 +13,9 @@ export class Visitante {
       throw new VisitanteInvalidoError(`La edad debe ser un entero entre ${LIMITES_EDAD.MIN} y ${LIMITES_EDAD.MAX}`)
     }
     const tipoPaseNormalizado = (tipoPase ?? '').toLowerCase()
+    if (tipoPaseNormalizado !== 'regular' && tipoPaseNormalizado !== 'vip') {
+      throw new VisitanteInvalidoError('El tipo de pase debe ser "regular" o "vip"')
+    }
     return new Visitante(edad, tipoPaseNormalizado)
   }
 
