@@ -4,17 +4,17 @@ import { Visitante } from './Visitante.js'
 import { Email } from '../valueObjects/Email.js'
 
 export class Compra {
-  constructor ({ id, nombreComprador, fechaVisita, email, visitantes, formaPago, cantidadEntradas, montoTotal, fechaCreacion }) {
-    this.id = id || crypto.randomUUID()
-    this.nombreComprador = (nombreComprador || '').trim()
-    this.fechaVisita = fechaVisita
-    this.email = email
-    this.emailComprador = email.valor
-    this.visitantes = Object.freeze([...visitantes])
-    this.formaPago = formaPago
-    this.cantidadEntradas = cantidadEntradas
-    this.montoTotal = montoTotal
-    this.fechaCreacion = fechaCreacion || new Date()
+  constructor (datos) {
+    this.id = datos.id || crypto.randomUUID()
+    this.nombreComprador = (datos.nombreComprador || '').trim()
+    this.fechaVisita = datos.fechaVisita
+    this.email = datos.email
+    this.emailComprador = datos.email.valor
+    this.visitantes = Object.freeze([...datos.visitantes])
+    this.formaPago = (datos.formaPago || '').toLowerCase()
+    this.cantidadEntradas = datos.cantidadEntradas
+    this.montoTotal = datos.montoTotal
+    this.fechaCreacion = datos.fechaCreacion || new Date()
     Object.freeze(this)
   }
 
@@ -29,7 +29,7 @@ export class Compra {
       fechaVisita: fechaVO,
       email: emailVO,
       visitantes: listaVisitantes,
-      formaPago: datos.formaPago,
+      formaPago: (datos.formaPago || '').toLowerCase(),
       cantidadEntradas: datos.cantidadEntradas,
       montoTotal: total
     })
