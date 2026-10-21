@@ -1,10 +1,14 @@
 import { Compra } from '../../domain/entities/Compra.js'
 
 export class ComprarEntradas {
+  #repositorioCompras
+  #pasarelaDePago
+  #servicioEmail
+
   constructor ({ repositorioCompras, pasarelaDePago, servicioEmail } = {}) {
-    this.repositorioCompras = repositorioCompras
-    this.pasarelaDePago = pasarelaDePago
-    this.servicioEmail = servicioEmail
+    this.#repositorioCompras = repositorioCompras
+    this.#pasarelaDePago = pasarelaDePago
+    this.#servicioEmail = servicioEmail
   }
 
   async ejecutar (datos, fechaReferencia = new Date()) {
