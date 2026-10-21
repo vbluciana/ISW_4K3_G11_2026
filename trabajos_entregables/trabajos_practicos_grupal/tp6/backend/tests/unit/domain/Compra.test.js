@@ -55,4 +55,10 @@ describe('Compra', () => {
     expect(() => Compra.crear(datosValidos({ cantidadEntradas: 0, visitantes: [] }), HOY))
       .toThrow(CantidadEntradasInvalidaError)
   })
+
+  it('rechaza cantidad de entradas mayor a 10', () => {
+    const onceVisitantes = Array.from({ length: 11 }, () => ({ edad: 30, tipoPase: 'regular' }))
+    expect(() => Compra.crear(datosValidos({ cantidadEntradas: 11, visitantes: onceVisitantes }), HOY))
+      .toThrow(CantidadEntradasInvalidaError)
+  })
 })
