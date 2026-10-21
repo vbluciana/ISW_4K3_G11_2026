@@ -15,11 +15,16 @@ export class PasarelaDePagoMercadoPago extends PasarelaDePago {
     this.autoReturn = autoReturn !== undefined ? autoReturn : this.frontendUrl.startsWith('https://')
   }
 
-  async crearPreferenciaPago ({ compra, visitantes, email }) {
+  async crearPreferenciaPago ({ compra, visitantes, email, frontendUrl } = {}) {
     const listaVisitantes = visitantes || (compra ? compra.visitantes : [])
     const emailPayer = email || (compra ? (compra.email?.valor || compra.email) : '')
     const idCompra = compra?.id
     const queryReserva = idCompra ? `?reserva=${idCompra}` : ''
+
+    const urlRetorno = (frontendUrl || this.frontendUrl || 'http://localhost:5173').replace(/\/+$/, '')
+    const debeAutoRetornar = this.autoReturn !== undefined
+      ? this.autoReturn
+      : urlRetorno.startsWith('https://')
 
     const items = listaVisitantes.map((visitante, indice) => ({
       title: `Entrada ${capitalizar(visitante.tipoPase)} #${indice + 1}`,
@@ -32,9 +37,9 @@ export class PasarelaDePagoMercadoPago extends PasarelaDePago {
       items,
       payer: { email: emailPayer },
       back_urls: {
-        success: `${this.frontendUrl}/pago-exitoso${queryReserva}`,
-        failure: `${this.frontendUrl}/pago-fallido${queryReserva}`,
-        pending: `${this.frontendUrl}/pago-pendiente${queryReserva}`
+        success: `${urlRetorno}/pago-exitoso${queryReserva}`,
+        failure: `${urlRetorno}/pago-fallido${queryReserva}`,
+        pending: `${urlRetorno}/pago-pendiente${queryReserva}`
       }
     }
 
@@ -42,7 +47,7 @@ export class PasarelaDePagoMercadoPago extends PasarelaDePago {
       body.external_reference = idCompra
     }
 
-    if (this.autoReturn) {
+    if (debeAutoRetornar) {
       body.auto_return = 'approved'
     }
 

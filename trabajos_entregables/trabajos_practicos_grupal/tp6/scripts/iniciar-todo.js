@@ -1,20 +1,24 @@
 import { spawn, exec } from 'node:child_process'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import fs from 'node:fs'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const raizTp6 = path.resolve(__dirname, '..')
 const dirBackend = path.join(raizTp6, 'backend')
 const dirFrontend = path.join(raizTp6, 'frontend')
+const binCloudflared = path.join(raizTp6, 'cloudflared.exe')
 
 const npmCmd = process.platform === 'win32' ? 'npm.cmd' : 'npm'
 const npxCmd = process.platform === 'win32' ? 'npx.cmd' : 'npx'
 
 let backendProcess = null
 let frontendProcess = null
+let tunnelProcess = null
 let backendListo = false
 let frontendListo = false
 let navegadorAbierto = false
+let urlTunelHttps = null
 
 function abrirNavegador () {
   if (navegadorAbierto) return
@@ -22,16 +26,22 @@ function abrirNavegador () {
   console.log('')
   console.log('--------------------------------------------------------------------------------')
   console.log('🎉 ¡SISTEMA LEVANTADO CON ÉXITO!')
-  console.log('   👉 Frontend (Aplicación Web): http://localhost:5173')
-  console.log('   👉 Backend (API REST):        http://localhost:3000')
+  if (urlTunelHttps) {
+    console.log(`   👉 Frontend HTTPS (Recomendado Mercado Pago): ${urlTunelHttps}`)
+  }
+  console.log('   👉 Frontend Local:                            http://localhost:5173')
+  console.log('   👉 Backend API REST:                          http://localhost:3000')
   console.log('--------------------------------------------------------------------------------')
+  console.log('💡 Al navegar mediante la URL HTTPS, Mercado Pago Sandbox cuenta con redirección')
+  console.log('   100% automática y botón de retorno oficial al parque.\n')
   console.log('Presione Ctrl + C para detener todos los servicios de forma limpia.\n')
 
+  const urlDestino = urlTunelHttps || 'http://localhost:5173'
   const comandoAbrir = process.platform === 'win32'
-    ? 'start http://localhost:5173'
+    ? `start ${urlDestino}`
     : process.platform === 'darwin'
-      ? 'open http://localhost:5173'
-      : 'xdg-open http://localhost:5173'
+      ? `open ${urlDestino}`
+      : `xdg-open ${urlDestino}`
 
   exec(comandoAbrir, () => {})
 }
@@ -98,9 +108,28 @@ function iniciarServicios () {
     }
   })
 
+  // 3. Iniciar Túnel Cloudflare HTTPS si está presente el ejecutable
+  if (fs.existsSync(binCloudflared)) {
+    tunnelProcess = spawn(binCloudflared, ['tunnel', '--url', 'http://localhost:5173'], {
+      shell: false
+    })
+
+    const manejarSalidaTunel = data => {
+      const texto = data.toString()
+      const match = texto.match(/https:\/\/[a-z0-9-]+\.trycloudflare\.com/)
+      if (match && !urlTunelHttps) {
+        urlTunelHttps = match[0]
+        console.log(`\x1b[35m[TUNEL HTTPS]\x1b[0m ${urlTunelHttps}`)
+      }
+    }
+
+    tunnelProcess.stdout.on('data', manejarSalidaTunel)
+    tunnelProcess.stderr.on('data', manejarSalidaTunel)
+  }
+
   setTimeout(() => {
     if (!navegadorAbierto) abrirNavegador()
-  }, 4000)
+  }, 4500)
 }
 
 // Iniciar directamente los servicios de Backend y Frontend
@@ -114,9 +143,11 @@ function apagar () {
     if (process.platform === 'win32') {
       if (backendProcess && backendProcess.pid) exec(`taskkill /pid ${backendProcess.pid} /T /F`, () => {})
       if (frontendProcess && frontendProcess.pid) exec(`taskkill /pid ${frontendProcess.pid} /T /F`, () => {})
+      if (tunnelProcess && tunnelProcess.pid) exec(`taskkill /pid ${tunnelProcess.pid} /T /F`, () => {})
     } else {
       if (backendProcess) backendProcess.kill('SIGINT')
       if (frontendProcess) frontendProcess.kill('SIGINT')
+      if (tunnelProcess) tunnelProcess.kill('SIGINT')
     }
   } catch (e) {
     // ignorar

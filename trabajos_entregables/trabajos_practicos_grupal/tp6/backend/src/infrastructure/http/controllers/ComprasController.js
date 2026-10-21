@@ -44,8 +44,19 @@ export class ComprasController {
         fechaVisita,
         cantidadEntradas,
         visitantes,
-        formaPago
+        formaPago,
+        frontendUrl
       } = req.body
+
+      let urlDetectada = req.body.frontendUrl
+      if (!urlDetectada) {
+        const cabecera = req.headers.origin || req.headers.referer
+        if (cabecera) {
+          try {
+            urlDetectada = new URL(cabecera).origin
+          } catch {}
+        }
+      }
 
       const fechaReferencia = req.app.locals.fechaReferencia || new Date()
 
@@ -56,7 +67,8 @@ export class ComprasController {
         fechaVisita,
         cantidadEntradas,
         visitantes,
-        formaPago
+        formaPago,
+        frontendUrl: urlDetectada
       }, fechaReferencia)
 
       if (process.env.NODE_ENV !== 'test') {

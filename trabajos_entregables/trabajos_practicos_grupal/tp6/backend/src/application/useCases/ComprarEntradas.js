@@ -26,7 +26,7 @@ export class ComprarEntradas {
     // 2. Procesar pago con pasarela externa si la forma de pago es tarjeta
     let pago = null
     if (compra.formaPago === 'tarjeta') {
-      pago = await this.#procesarPagoTarjeta(compra)
+      pago = await this.#procesarPagoTarjeta(compra, datos.frontendUrl)
     }
 
     // 3. Persistir compra en repositorio
@@ -51,7 +51,7 @@ export class ComprarEntradas {
     }
   }
 
-  async #procesarPagoTarjeta (compra) {
+  async #procesarPagoTarjeta (compra, frontendUrl) {
     if (!this.#pasarelaDePago) {
       throw new PagoRechazadoError('Pasarela de pago no configurada')
     }
@@ -61,7 +61,8 @@ export class ComprarEntradas {
         compra,
         email: compra.email.valor,
         visitantes: compra.visitantes,
-        montoTotal: compra.montoTotal
+        montoTotal: compra.montoTotal,
+        frontendUrl
       })
     } catch (error) {
       if (error instanceof PagoRechazadoError) {
