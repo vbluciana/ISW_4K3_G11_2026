@@ -55,4 +55,9 @@ describe('FechaVisita', () => {
     const fechaRefDiciembre = new Date(2026, 11, 1)
     expect(() => FechaVisita.crear('25-12-2026', fechaRefDiciembre)).toThrow(FechaVisitaInvalidaError)
   })
+
+  it('rechaza el 1 de enero por ser feriado de cierre', () => {
+    const fechaRefEnero = new Date(2026, 11, 20)
+    expect(() => FechaVisita.crear('01-01-2027', fechaRefEnero)).toThrow(FechaVisitaInvalidaError)
+  })
 })
