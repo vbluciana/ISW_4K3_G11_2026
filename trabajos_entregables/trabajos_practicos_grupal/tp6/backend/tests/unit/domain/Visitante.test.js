@@ -42,4 +42,12 @@ describe('Visitante', () => {
     expect(() => Visitante.crear({ edad: 30, tipoPase: 'premium' }))
       .toThrow(VisitanteInvalidoError)
   })
+
+  it('calcula su propio precio final colaborando con CalculadoraTarifas (Information Expert)', () => {
+    const adulto = Visitante.crear({ edad: 30, tipoPase: 'regular' })
+    const menor = Visitante.crear({ edad: 10, tipoPase: 'regular' })
+
+    expect(adulto.calcularPrecio()).toBe(10000)
+    expect(menor.calcularPrecio()).toBe(5000)
+  })
 })
