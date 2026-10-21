@@ -24,4 +24,8 @@ describe('FechaVisita', () => {
     expect(() => FechaVisita.crear('20-10-6598', HOY)).toThrow('El año de la fecha de visita es inválido')
     expect(() => FechaVisita.crear('20-10-2025', HOY)).toThrow('El año de la fecha de visita es inválido')
   })
+
+  it('rechaza fechas anteriores al día de hoy', () => {
+    expect(() => FechaVisita.crear('16-10-2026', HOY)).toThrow('La fecha de visita no puede ser anterior al día de hoy')
+  })
 })
