@@ -32,4 +32,11 @@ describe('generadorComprobante', () => {
   it('formatea el monto total como moneda argentina', () => {
     expect(comprobante.montoTotal).toBe(FORMATO_MONEDA_ARS.format(20000))
   })
+
+  it('detalla cada entrada con su número, edad, tipo de pase y precio final formateado', () => {
+    expect(comprobante.detalleEntradas).toEqual([
+      { numero: 1, edad: 30, tipoPase: 'Regular', precioFinal: FORMATO_MONEDA_ARS.format(10000) },
+      { numero: 2, edad: 10, tipoPase: 'Vip', precioFinal: FORMATO_MONEDA_ARS.format(10000) }
+    ])
+  })
 })
