@@ -1,4 +1,5 @@
 import { Compra } from '../../domain/entities/Compra.js'
+import { PagoRechazadoError } from '../../domain/errors/DomainError.js'
 
 export class ComprarEntradas {
   #repositorioCompras
@@ -16,7 +17,11 @@ export class ComprarEntradas {
 
     let pago = null
     if (compra.formaPago === 'tarjeta') {
-      pago = await this.#procesarPagoTarjeta(compra)
+      try {
+        pago = await this.#procesarPagoTarjeta(compra)
+      } catch (err) {
+        throw err
+      }
     }
 
     if (this.#repositorioCompras) {
@@ -25,7 +30,6 @@ export class ComprarEntradas {
 
     const comprobante = this.#armarComprobante(compra, pago)
 
-    // En efectivo se envia el email de reserva; en tarjeta se aguarda confirmacion del webhook
     if (compra.formaPago === 'efectivo' && this.#servicioEmail) {
       await this.#servicioEmail.enviarComprobante({
         email: compra.email.valor,
@@ -38,7 +42,7 @@ export class ComprarEntradas {
 
   async #procesarPagoTarjeta (compra) {
     if (!this.#pasarelaDePago) {
-      return null
+      throw new PagoRechazadoError('Pasarela de pago no configurada')
     }
     return await this.#pasarelaDePago.crearPreferenciaPago({
       compra,
