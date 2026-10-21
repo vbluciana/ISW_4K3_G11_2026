@@ -12,6 +12,10 @@ export class CalculadoraTarifas {
       return Math.round(precioBase * DESCUENTOS_POR_EDAD.DESCUENTO_MENOR_PORCENTAJE)
     }
 
+    if (edad >= 60) {
+      return Math.round(precioBase * 0.5)
+    }
+
     return precioBase
   }
 }
