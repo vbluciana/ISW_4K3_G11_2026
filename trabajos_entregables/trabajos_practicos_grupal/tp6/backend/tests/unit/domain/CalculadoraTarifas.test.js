@@ -30,4 +30,9 @@ describe('CalculadoraTarifas', () => {
     expect(CalculadoraTarifas.calcularPrecio({ edad: 16, tipoPase: 'regular' })).toBe(10000)
     expect(CalculadoraTarifas.calcularPrecio({ edad: 59, tipoPase: 'vip' })).toBe(20000)
   })
+
+  it('es insensible a mayúsculas/minúsculas en el tipo de pase', () => {
+    expect(CalculadoraTarifas.calcularPrecio({ edad: 30, tipoPase: 'REGULAR' })).toBe(10000)
+    expect(CalculadoraTarifas.calcularPrecio({ edad: 30, tipoPase: 'Vip' })).toBe(20000)
+  })
 })
