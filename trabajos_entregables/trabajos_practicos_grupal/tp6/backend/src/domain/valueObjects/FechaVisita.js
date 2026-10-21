@@ -7,8 +7,17 @@ export class FechaVisita {
     this.valor = valor
   }
   static crear (fechaString) {
-    if (!FORMATO_DD_MM_AAAA.test(fechaString ?? '')) {
+    const coincidencia = FORMATO_DD_MM_AAAA.exec(fechaString ?? '')
+    if (!coincidencia) {
       throw new FechaVisitaInvalidaError('La fecha debe tener el formato dd-mm-aaaa')
+    }
+    const [, diaStr, mesStr, anioStr] = coincidencia
+    const dia = Number(diaStr)
+    const mes = Number(mesStr)
+    const anio = Number(anioStr)
+    const fecha = new Date(anio, mes - 1, dia)
+    if (fecha.getFullYear() !== anio || fecha.getMonth() !== mes - 1 || fecha.getDate() !== dia) {
+      throw new FechaVisitaInvalidaError('La fecha ingresada no existe en el calendario')
     }
     return new FechaVisita(fechaString)
   }
