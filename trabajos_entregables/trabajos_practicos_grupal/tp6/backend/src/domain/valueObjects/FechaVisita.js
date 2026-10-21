@@ -1,3 +1,8 @@
 export class FechaVisita {
-  static crear () { return null }
+  constructor (valor) {
+    this.valor = valor
+  }
+  static crear (valor) {
+    return new FechaVisita(valor)
+  }
 }
