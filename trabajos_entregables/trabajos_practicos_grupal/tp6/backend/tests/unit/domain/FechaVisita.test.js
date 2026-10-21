@@ -60,4 +60,9 @@ describe('FechaVisita', () => {
     const fechaRefEnero = new Date(2026, 11, 20)
     expect(() => FechaVisita.crear('01-01-2027', fechaRefEnero)).toThrow(FechaVisitaInvalidaError)
   })
+
+  it('es inmutable con Object.freeze', () => {
+    const fechaVisita = FechaVisita.crear('20-10-2026', HOY)
+    expect(Object.isFrozen(fechaVisita)).toBe(true)
+  })
 })
