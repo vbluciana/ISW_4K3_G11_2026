@@ -23,16 +23,16 @@ function abrirNavegador () {
   console.log('')
   console.log('--------------------------------------------------------------------------------')
   console.log('🎉 ¡SISTEMA LEVANTADO CON ÉXITO!')
-  console.log('   👉 Frontend (Aplicación Web): http://localhost:5173')
+  console.log('   👉 Frontend (Aplicación Web): https://localhost:5173')
   console.log('   👉 Backend (API REST):        http://localhost:3000')
   console.log('--------------------------------------------------------------------------------')
   console.log('Presione Ctrl + C para detener todos los servicios de forma limpia.\n')
 
   const comandoAbrir = process.platform === 'win32'
-    ? 'start http://localhost:5173'
+    ? 'start https://localhost:5173'
     : process.platform === 'darwin'
-      ? 'open http://localhost:5173'
-      : 'xdg-open http://localhost:5173'
+      ? 'open https://localhost:5173'
+      : 'xdg-open https://localhost:5173'
 
   exec(comandoAbrir, () => {})
 }
