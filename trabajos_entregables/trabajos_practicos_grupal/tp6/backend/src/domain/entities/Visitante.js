@@ -10,7 +10,11 @@ export class Visitante {
     return new Visitante(edad, tipoPase)
   }
 
-  get precio () {
+  calcularPrecio () {
     return CalculadoraTarifas.calcularPrecio({ edad: this.edad, tipoPase: this.tipoPase })
+  }
+
+  get precio () {
+    return this.calcularPrecio()
   }
 }
