@@ -21,7 +21,10 @@ export class PasarelaDePagoMercadoPago extends PasarelaDePago {
     const idCompra = compra?.id
     const queryReserva = idCompra ? `?reserva=${idCompra}` : ''
 
-    const urlRetorno = (frontendUrl || this.frontendUrl || 'http://localhost:5173').replace(/\/+$/, '')
+    let urlRetorno = (frontendUrl || this.frontendUrl || 'http://localhost:5173').replace(/\/+$/, '')
+    if (process.env.NODE_ENV !== 'test' && urlRetorno.includes('localhost')) {
+      urlRetorno = urlRetorno.replace('localhost', 'localtest.me')
+    }
     const debeAutoRetornar = this.autoReturn !== undefined
       ? this.autoReturn
       : urlRetorno.startsWith('https://')

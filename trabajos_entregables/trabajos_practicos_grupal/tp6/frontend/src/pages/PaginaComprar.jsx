@@ -61,6 +61,7 @@ export function PaginaComprar ({ onCompraRealizada, formaPagoInicial, errorInici
   const [formaPago, setFormaPago] = useState(() => formaPagoInicial || borradorGuardado?.formaPago || 'efectivo')
   const [error, setError] = useState(() => errorInicial || '')
   const [cargando, setCargando] = useState(false)
+  const [esperandoPago, setEsperandoPago] = useState(null)
 
   // Límites dinámicos para el selector de fecha
   const fechaMinima = useMemo(() => obtenerHoyFormatoHtml(), [])
@@ -189,20 +190,13 @@ export function PaginaComprar ({ onCompraRealizada, formaPagoInicial, errorInici
         try {
           sessionStorage.setItem('ecoharmony_ultima_compra', JSON.stringify(resultado.comprobante))
           sessionStorage.setItem('ecoharmony_id_reserva', resultado.comprobante.idReserva)
-          sessionStorage.setItem('ecoharmony_borrador_formulario', JSON.stringify({
-            nombreComprador: nombreComprador.trim(),
-            emailComprador: emailComprador.trim(),
-            fecha,
-            cantidadEntradas,
-            visitantes,
-            formaPago
-          }))
         } catch (e) {
           console.warn('No se pudo guardar en sessionStorage:', e)
         }
 
         const urlPago = resultado.pago.sandboxInitPoint || resultado.pago.initPoint
-        window.location.href = urlPago
+        setEsperandoPago({ urlPago, comprobante: resultado.comprobante })
+        window.open(urlPago, '_blank')
         return
       }
 
@@ -467,6 +461,90 @@ export function PaginaComprar ({ onCompraRealizada, formaPagoInicial, errorInici
           </button>
         </div>
       </aside>
+
+      {esperandoPago && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.75)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999,
+          padding: '1.5rem'
+        }}>
+          <div style={{
+            background: '#ffffff',
+            borderRadius: '16px',
+            maxWidth: '540px',
+            width: '100%',
+            padding: '2.5rem',
+            textAlign: 'center',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
+          }}>
+            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>💳</div>
+            <h2 style={{ fontSize: '1.6rem', color: '#1a365d', marginBottom: '0.75rem', fontWeight: 700 }}>
+              Completando Pago en Mercado Pago
+            </h2>
+            <p style={{ color: '#4a5568', lineHeight: 1.5, marginBottom: '1.75rem' }}>
+              Se abrió la pasarela oficial de <strong>Mercado Pago Sandbox</strong> en una pestaña nueva para que ingreses tus datos con total seguridad.
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              <button
+                type="button"
+                onClick={() => onCompraRealizada(esperandoPago.comprobante)}
+                style={{
+                  backgroundColor: '#2b6cb0',
+                  color: '#ffffff',
+                  fontWeight: 600,
+                  fontSize: '1rem',
+                  padding: '0.875rem 1.5rem',
+                  borderRadius: '10px',
+                  border: 'none',
+                  cursor: 'pointer'
+                }}
+              >
+                ✓ Ya completé el pago (Ver mi Comprobante)
+              </button>
+              <a
+                href={esperandoPago.urlPago}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'inline-block',
+                  backgroundColor: '#edf2f7',
+                  color: '#2d3748',
+                  fontWeight: 600,
+                  fontSize: '0.95rem',
+                  padding: '0.75rem 1.5rem',
+                  borderRadius: '10px',
+                  textDecoration: 'none'
+                }}
+              >
+                Abrir Mercado Pago nuevamente
+              </a>
+              <button
+                type="button"
+                onClick={() => setEsperandoPago(null)}
+                style={{
+                  backgroundColor: 'transparent',
+                  color: '#718096',
+                  fontSize: '0.9rem',
+                  padding: '0.5rem',
+                  border: 'none',
+                  cursor: 'pointer',
+                  textDecoration: 'underline'
+                }}
+              >
+                Cancelar y volver a la reserva
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
