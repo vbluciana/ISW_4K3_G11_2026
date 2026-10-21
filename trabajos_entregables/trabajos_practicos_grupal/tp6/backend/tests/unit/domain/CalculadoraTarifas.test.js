@@ -35,4 +35,9 @@ describe('CalculadoraTarifas', () => {
     expect(CalculadoraTarifas.calcularPrecio({ edad: 30, tipoPase: 'REGULAR' })).toBe(10000)
     expect(CalculadoraTarifas.calcularPrecio({ edad: 30, tipoPase: 'Vip' })).toBe(20000)
   })
+
+  it('rechaza un tipo de pase que no sea regular ni vip', () => {
+    expect(() => CalculadoraTarifas.calcularPrecio({ edad: 30, tipoPase: 'premium' }))
+      .toThrow(VisitanteInvalidoError)
+  })
 })
