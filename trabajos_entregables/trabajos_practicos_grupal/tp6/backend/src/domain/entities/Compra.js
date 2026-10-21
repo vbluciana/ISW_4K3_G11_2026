@@ -3,19 +3,33 @@ import { FechaVisita } from '../valueObjects/FechaVisita.js'
 import { Visitante } from './Visitante.js'
 import { Email } from '../valueObjects/Email.js'
 import { CantidadEntradasInvalidaError } from '../errors/DomainError.js'
+import { CANTIDAD_MINIMA_ENTRADAS } from '../../config/parque.config.js'
+
+function validarCantidadMinima (cantidad) {
+  if (typeof cantidad !== 'number' || cantidad < CANTIDAD_MINIMA_ENTRADAS) {
+    throw new CantidadEntradasInvalidaError(
+      `La cantidad de entradas debe ser al menos ${CANTIDAD_MINIMA_ENTRADAS}`
+    )
+  }
+}
 
 export class Compra {
-  constructor (params) {
-    Object.assign(this, params)
-    this.id = params.id || crypto.randomUUID()
-    this.emailComprador = params.email.valor
+  constructor ({ id, nombreComprador, fechaVisita, email, visitantes, formaPago, cantidadEntradas, montoTotal, fechaCreacion }) {
+    this.id = id || crypto.randomUUID()
+    this.nombreComprador = (nombreComprador || '').trim()
+    this.fechaVisita = fechaVisita
+    this.email = email
+    this.emailComprador = email.valor
+    this.visitantes = Object.freeze([...visitantes])
+    this.formaPago = (formaPago || '').toLowerCase()
+    this.cantidadEntradas = cantidadEntradas
+    this.montoTotal = montoTotal
+    this.fechaCreacion = fechaCreacion || new Date()
     Object.freeze(this)
   }
 
   static crear (datos, hoy = new Date()) {
-    if (datos.cantidadEntradas < 1) {
-      throw new CantidadEntradasInvalidaError('La cantidad de entradas debe ser al menos 1')
-    }
+    validarCantidadMinima(datos.cantidadEntradas)
     const fechaVO = FechaVisita.crear(datos.fechaVisita, hoy)
     const emailVO = Email.crear(datos.email || datos.emailComprador)
     const listaVisitantes = (datos.visitantes || []).map(v => Visitante.crear(v))
@@ -26,7 +40,7 @@ export class Compra {
       fechaVisita: fechaVO,
       email: emailVO,
       visitantes: listaVisitantes,
-      formaPago: (datos.formaPago || '').toLowerCase(),
+      formaPago: datos.formaPago,
       cantidadEntradas: datos.cantidadEntradas,
       montoTotal: total
     })
