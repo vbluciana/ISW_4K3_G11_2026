@@ -22,11 +22,13 @@ export class FechaVisita {
     this.valor = valor
     Object.freeze(this)
   }
+
   static crear (fechaString, hoy = new Date()) {
     const coincidencia = FORMATO_DD_MM_AAAA.exec(fechaString ?? '')
     if (!coincidencia) {
       throw new FechaVisitaInvalidaError('La fecha debe tener el formato dd-mm-aaaa')
     }
+
     const [, diaStr, mesStr, anioStr] = coincidencia
     const dia = Number(diaStr)
     const mes = Number(mesStr)
