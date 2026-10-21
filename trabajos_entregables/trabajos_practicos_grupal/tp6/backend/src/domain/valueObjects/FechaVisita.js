@@ -1,4 +1,4 @@
-import { DIA_SEMANA_CERRADO, MAX_DIAS_ANTICIPACION } from '../../config/parque.config.js'
+import { FERIADOS_CERRADOS, DIA_SEMANA_CERRADO, MAX_DIAS_ANTICIPACION } from '../../config/parque.config.js'
 import { FechaVisitaInvalidaError } from '../errors/DomainError.js'
 
 const FORMATO_DD_MM_AAAA = /^(\d{2})-(\d{2})-(\d{4})$/
@@ -11,6 +11,10 @@ function iniciarDia (fecha) {
 
 function esFechaCalendarioValida (dia, mes, anio, fecha) {
   return fecha.getFullYear() === anio && fecha.getMonth() === mes - 1 && fecha.getDate() === dia
+}
+
+function esFeriadoCerrado (dia, mes) {
+  return FERIADOS_CERRADOS.some(feriado => feriado.dia === dia && feriado.mes === mes)
 }
 
 export class FechaVisita {
@@ -52,7 +56,7 @@ export class FechaVisita {
       throw new FechaVisitaInvalidaError('El parque permanece cerrado los días lunes')
     }
 
-    if (dia === 25 && mes === 12) {
+    if (esFeriadoCerrado(dia, mes)) {
       throw new FechaVisitaInvalidaError('El parque permanece cerrado en esa fecha por feriado')
     }
 
