@@ -20,7 +20,7 @@ export function crearApp ({ repositorioCompras, pasarelaDePago, servicioEmail, f
     servicioEmail
   })
 
-  const comprasController = new ComprasController(comprarEntradas, repositorioCompras)
+  const comprasController = new ComprasController(comprarEntradas, repositorioCompras, servicioEmail)
 
   app.use('/api/compras', crearRutasCompras(comprasController))
 

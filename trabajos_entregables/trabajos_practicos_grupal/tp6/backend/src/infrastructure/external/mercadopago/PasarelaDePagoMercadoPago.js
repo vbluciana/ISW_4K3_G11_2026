@@ -17,18 +17,11 @@ export class PasarelaDePagoMercadoPago extends PasarelaDePago {
 
   async crearPreferenciaPago ({ compra, visitantes, email, frontendUrl } = {}) {
     const listaVisitantes = visitantes || (compra ? compra.visitantes : [])
-    const emailPayerReal = email || (compra ? (compra.email?.valor || compra.email) : '')
-    const emailPayer = (process.env.NODE_ENV !== 'test' && !emailPayerReal.includes('@testuser.com'))
-      ? 'test_user_8207705484891376030@testuser.com'
-      : emailPayerReal
-
+    const emailPayer = email || (compra ? (compra.email?.valor || compra.email) : '')
     const idCompra = compra?.id
     const queryReserva = idCompra ? `?reserva=${idCompra}` : ''
 
-    let urlRetorno = (frontendUrl || this.frontendUrl || 'http://localhost:5173').replace(/\/+$/, '')
-    if (process.env.NODE_ENV !== 'test' && urlRetorno.includes('localhost')) {
-      urlRetorno = urlRetorno.replace('localhost', 'localtest.me')
-    }
+    const urlRetorno = (frontendUrl || this.frontendUrl || 'http://localhost:5173').replace(/\/+$/, '')
     const debeAutoRetornar = this.autoReturn !== undefined
       ? this.autoReturn
       : urlRetorno.startsWith('https://')

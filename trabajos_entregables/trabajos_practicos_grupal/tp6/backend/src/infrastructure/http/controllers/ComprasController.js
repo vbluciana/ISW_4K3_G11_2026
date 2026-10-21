@@ -1,7 +1,8 @@
 export class ComprasController {
-  constructor (comprarEntradas, repositorioCompras) {
+  constructor (comprarEntradas, repositorioCompras, servicioEmail) {
     this.comprarEntradas = comprarEntradas
     this.repositorioCompras = repositorioCompras
+    this.servicioEmail = servicioEmail
   }
 
   obtenerPorId = async (req, res, next) => {
@@ -16,20 +17,35 @@ export class ComprasController {
         return res.status(404).json({ error: 'Compra no encontrada' })
       }
 
-      return res.status(200).json({
-        comprobante: {
-          idReserva: compra.id,
-          nombreComprador: compra.nombreComprador,
-          emailComprador: compra.emailComprador || (compra.email?.valor || compra.email),
-          fechaVisita: compra.fechaVisita.valor,
-          cantidadEntradas: compra.cantidadEntradas,
-          visitantes: compra.visitantes.map(v => (typeof v.toJSON === 'function' ? v.toJSON() : v)),
-          formaPago: compra.formaPago,
-          montoTotal: compra.montoTotal,
-          estado: compra.formaPago === 'tarjeta' ? 'PAGO_CONFIRMADO' : 'PENDIENTE_PAGO_BOLETERIA',
-          fechaEmision: compra.fechaCreacion ? compra.fechaCreacion.toISOString() : new Date().toISOString()
+      const comprobante = {
+        idReserva: compra.id,
+        nombreComprador: compra.nombreComprador,
+        emailComprador: compra.emailComprador || (compra.email?.valor || compra.email),
+        fechaVisita: compra.fechaVisita.valor,
+        cantidadEntradas: compra.cantidadEntradas,
+        visitantes: compra.visitantes.map(v => (typeof v.toJSON === 'function' ? v.toJSON() : v)),
+        formaPago: compra.formaPago,
+        montoTotal: compra.montoTotal,
+        estado: compra.formaPago === 'tarjeta' ? 'PAGO_CONFIRMADO' : 'PENDIENTE_PAGO_BOLETERIA',
+        fechaEmision: compra.fechaCreacion ? compra.fechaCreacion.toISOString() : new Date().toISOString()
+      }
+
+      if (compra.formaPago === 'tarjeta' && this.servicioEmail && !compra.emailEnviado) {
+        try {
+          compra.emailEnviado = true
+          await this.servicioEmail.enviarComprobante({
+            email: compra.email?.valor || compra.emailComprador,
+            comprobante
+          })
+          if (process.env.NODE_ENV !== 'test') {
+            console.log(`[Backend] 📧 ✓ Comprobante enviado por correo tras confirmación de pago a: ${comprobante.emailComprador}`)
+          }
+        } catch (errEmail) {
+          console.warn('[Backend] ⚠️ Error al enviar email de comprobante:', errEmail.message)
         }
-      })
+      }
+
+      return res.status(200).json({ comprobante })
     } catch (error) {
       next(error)
     }
@@ -73,9 +89,12 @@ export class ComprasController {
 
       if (process.env.NODE_ENV !== 'test') {
         const titular = nombreComprador || 'Comprador EcoHarmony'
-        const metodo = formaPago === 'tarjeta' ? 'Tarjeta (MP)' : 'Efectivo'
         const monto = resultado.comprobante ? `$${resultado.comprobante.montoTotal.toLocaleString('es-AR')}` : 'Procesando'
-        console.log(`[Backend] ✓ Compra registrada: ${titular} | ${cantidadEntradas} pase(s) | Total: ${monto} | Pago: ${metodo}`)
+        if (formaPago === 'tarjeta') {
+          console.log(`[Backend] ⏳ Preferencia Mercado Pago generada: ${titular} | ${cantidadEntradas} pase(s) | Total: ${monto} | Esperando pago en pasarela`)
+        } else {
+          console.log(`[Backend] ✓ Compra en efectivo registrada: ${titular} | ${cantidadEntradas} pase(s) | Total: ${monto} | Comprobante enviado por email`)
+        }
       }
 
       return res.status(201).json(resultado)

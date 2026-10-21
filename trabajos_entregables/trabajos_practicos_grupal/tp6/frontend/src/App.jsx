@@ -49,8 +49,8 @@ function App () {
       setComprobante(guardado)
     }
 
-    // 2. Si no estaba en sessionStorage y el pago es exitoso, buscar en el backend por ID
-    if (!guardado && idReserva && (ruta === '/pago-exitoso' || statusMP === 'approved')) {
+    // 2. Si el pago es exitoso, confirmar en el backend por ID y enviar comprobante por email
+    if (idReserva && (ruta === '/pago-exitoso' || statusMP === 'approved')) {
       setCargandoComprobante(true)
       clienteApi.obtenerCompraPorId(idReserva)
         .then(res => {
