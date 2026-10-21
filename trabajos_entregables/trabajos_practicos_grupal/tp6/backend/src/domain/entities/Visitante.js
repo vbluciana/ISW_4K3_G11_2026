@@ -9,8 +9,8 @@ export class Visitante {
   }
 
   static crear ({ edad, tipoPase }) {
-    if (edad < LIMITES_EDAD.MIN) {
-      throw new VisitanteInvalidoError(`La edad debe ser mayor o igual a ${LIMITES_EDAD.MIN}`)
+    if (edad < LIMITES_EDAD.MIN || edad > 100) {
+      throw new VisitanteInvalidoError('Edad fuera de rango')
     }
     const tipoPaseNormalizado = (tipoPase ?? '').toLowerCase()
     return new Visitante(edad, tipoPaseNormalizado)
