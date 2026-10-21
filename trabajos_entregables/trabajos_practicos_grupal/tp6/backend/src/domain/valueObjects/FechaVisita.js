@@ -1,4 +1,4 @@
-import { DIA_SEMANA_CERRADO } from '../../config/parque.config.js'
+import { DIA_SEMANA_CERRADO, MAX_DIAS_ANTICIPACION } from '../../config/parque.config.js'
 import { FechaVisitaInvalidaError } from '../errors/DomainError.js'
 
 const FORMATO_DD_MM_AAAA = /^(\d{2})-(\d{2})-(\d{4})$/
@@ -39,6 +39,13 @@ export class FechaVisita {
 
     if (iniciarDia(fecha) < iniciarDia(hoy)) {
       throw new FechaVisitaInvalidaError('La fecha de visita no puede ser anterior al día de hoy')
+    }
+
+    const fechaLimite = new Date(iniciarDia(hoy))
+    fechaLimite.setDate(fechaLimite.getDate() + MAX_DIAS_ANTICIPACION)
+
+    if (iniciarDia(fecha) > fechaLimite) {
+      throw new FechaVisitaInvalidaError(`La fecha de visita no puede superar los ${MAX_DIAS_ANTICIPACION} días de anticipación`)
     }
 
     if (fecha.getDay() === DIA_SEMANA_CERRADO) {
