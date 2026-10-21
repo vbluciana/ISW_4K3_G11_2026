@@ -59,8 +59,18 @@ export class ComprasController {
         formaPago
       }, fechaReferencia)
 
+      if (process.env.NODE_ENV !== 'test') {
+        const titular = nombreComprador || 'Comprador EcoHarmony'
+        const metodo = formaPago === 'tarjeta' ? 'Tarjeta (MP)' : 'Efectivo'
+        const monto = resultado.comprobante ? `$${resultado.comprobante.montoTotal.toLocaleString('es-AR')}` : 'Procesando'
+        console.log(`[Backend] ✓ Compra registrada: ${titular} | ${cantidadEntradas} pase(s) | Total: ${monto} | Pago: ${metodo}`)
+      }
+
       return res.status(201).json(resultado)
     } catch (error) {
+      if (process.env.NODE_ENV !== 'test') {
+        console.warn(`[Backend] ⚠️ Petición rechazada (${error.name}): ${error.message}`)
+      }
       next(error)
     }
   }
