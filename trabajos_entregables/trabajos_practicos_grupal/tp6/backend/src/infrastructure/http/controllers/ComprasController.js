@@ -3,6 +3,7 @@ export class ComprasController {
     this.comprarEntradas = comprarEntradas
     this.repositorioCompras = repositorioCompras
     this.servicioEmail = servicioEmail
+    this.emailsEnviados = new Set()
   }
 
   obtenerPorId = async (req, res, next) => {
@@ -30,17 +31,18 @@ export class ComprasController {
         fechaEmision: compra.fechaCreacion ? compra.fechaCreacion.toISOString() : new Date().toISOString()
       }
 
-      if (compra.formaPago === 'tarjeta' && this.servicioEmail && !compra.emailEnviado) {
+      if (compra.formaPago === 'tarjeta' && this.servicioEmail && !this.emailsEnviados.has(compra.id)) {
         try {
-          compra.emailEnviado = true
+          this.emailsEnviados.add(compra.id)
           await this.servicioEmail.enviarComprobante({
-            email: compra.email?.valor || compra.emailComprador,
+            email: compra.emailComprador || (compra.email?.valor || compra.email),
             comprobante
           })
           if (process.env.NODE_ENV !== 'test') {
             console.log(`[Backend] 📧 ✓ Comprobante enviado por correo tras confirmación de pago a: ${comprobante.emailComprador}`)
           }
         } catch (errEmail) {
+          this.emailsEnviados.delete(compra.id)
           console.warn('[Backend] ⚠️ Error al enviar email de comprobante:', errEmail.message)
         }
       }
