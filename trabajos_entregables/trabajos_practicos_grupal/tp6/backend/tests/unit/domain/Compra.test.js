@@ -80,4 +80,9 @@ describe('Compra', () => {
     expect(() => Compra.crear(datosValidos({ formaPago: 'cripto' }), HOY))
       .toThrow(FormaPagoInvalidaError)
   })
+
+  it('propaga errores de validación del email', () => {
+    expect(() => Compra.crear(datosValidos({ email: 'correo-invalido' }), HOY))
+      .toThrow(EmailInvalidoError)
+  })
 })
