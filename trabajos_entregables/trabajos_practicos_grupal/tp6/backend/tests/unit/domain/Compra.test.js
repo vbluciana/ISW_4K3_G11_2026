@@ -66,4 +66,13 @@ describe('Compra', () => {
     expect(() => Compra.crear(datosValidos({ cantidadEntradas: 3 }), HOY))
       .toThrow(CantidadEntradasInvalidaError)
   })
+
+  it('propaga errores de validación de visitantes', () => {
+    const visitantesInvalidos = [
+      { edad: 30, tipoPase: 'regular' },
+      { edad: 150, tipoPase: 'regular' }
+    ]
+    expect(() => Compra.crear(datosValidos({ visitantes: visitantesInvalidos }), HOY))
+      .toThrow(VisitanteInvalidoError)
+  })
 })
