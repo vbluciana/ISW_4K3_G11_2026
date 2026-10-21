@@ -45,4 +45,9 @@ describe('Compra', () => {
     const compra = Compra.crear(datosValidos({ formaPago: 'TARJETA' }), HOY)
     expect(compra.formaPago).toBe('tarjeta')
   })
+
+  it('propaga el error de fecha inválida', () => {
+    expect(() => Compra.crear(datosValidos({ fechaVisita: '19-10-2026' }), HOY))
+      .toThrow(FechaVisitaInvalidaError)
+  })
 })
