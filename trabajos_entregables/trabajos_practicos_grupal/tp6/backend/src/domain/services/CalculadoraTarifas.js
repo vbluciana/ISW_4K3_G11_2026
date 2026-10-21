@@ -1,5 +1,7 @@
+import { PRECIOS_BASE } from '../../config/parque.config.js'
+
 export class CalculadoraTarifas {
-  static calcularPrecio () {
-    return 10000
+  static calcularPrecio ({ edad, tipoPase }) {
+    return PRECIOS_BASE.regular
   }
 }
