@@ -45,4 +45,9 @@ describe('FechaVisita', () => {
     // 19-10-2026 es lunes.
     expect(() => FechaVisita.crear('19-10-2026', HOY)).toThrow(FechaVisitaInvalidaError)
   })
+
+  it('rechaza fechas con más de 30 días de anticipación', () => {
+    // Desde el 17-10-2026, el 25-11-2026 supera los 30 días.
+    expect(() => FechaVisita.crear('25-11-2026', HOY)).toThrow(FechaVisitaInvalidaError)
+  })
 })
