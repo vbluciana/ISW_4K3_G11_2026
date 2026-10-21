@@ -66,4 +66,19 @@ describe('ComprarEntradas', () => {
     expect(servicioEmail.enviados).toHaveLength(1)
     expect(servicioEmail.enviados[0].email).toBe('ana@ecoharmony.com')
   })
+
+  it('compra con tarjeta: crea la preferencia en la pasarela pero NO envía email de inmediato', async () => {
+    const datosTarjeta = datosValidos({ formaPago: 'tarjeta' })
+
+    const resultado = await casoDeUso.ejecutar(datosTarjeta, HOY)
+
+    expect(resultado.comprobante).toBeDefined()
+    expect(resultado.comprobante.estado).toBe('PREFERENCIA_PAGO_GENERADA')
+    expect(resultado.pago).toBeDefined()
+    expect(resultado.pago.initPoint).toBe('https://sandbox.mercadopago.com/checkout/fake-preference-id')
+
+    expect(await repositorioCompras.listarTodas()).toHaveLength(1)
+    expect(pasarelaDePago.llamadas).toHaveLength(1)
+    expect(servicioEmail.enviados).toHaveLength(0)
+  })
 })
