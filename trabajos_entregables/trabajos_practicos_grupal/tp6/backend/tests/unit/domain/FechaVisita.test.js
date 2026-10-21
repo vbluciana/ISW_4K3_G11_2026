@@ -33,4 +33,11 @@ describe('FechaVisita', () => {
     // 12-10-2026 fue lunes anterior a HOY (17-10-2026)
     expect(() => FechaVisita.crear('12-10-2026', HOY)).toThrow('La fecha de visita no puede ser anterior al día de hoy')
   })
+
+  it('acepta el día de hoy como fecha de visita válida', () => {
+    // 17-10-2026 es sábado, día hábil.
+    const fechaVisita = FechaVisita.crear('17-10-2026', HOY)
+
+    expect(fechaVisita.valor).toBe('17-10-2026')
+  })
 })
