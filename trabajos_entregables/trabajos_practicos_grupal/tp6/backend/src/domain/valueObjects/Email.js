@@ -7,7 +7,11 @@ export class Email {
   }
 
   static crear (valor) {
-    if (!valor || !String(valor).includes('@')) {
+    if (!valor || !valor.includes('@')) {
+      throw new EmailInvalidoError('El email ingresado no tiene un formato válido')
+    }
+    const partes = valor.split('@')
+    if (partes.length !== 2 || !partes[1] || !partes[1].includes('.')) {
       throw new EmailInvalidoError('El email ingresado no tiene un formato válido')
     }
     return new Email(valor)
