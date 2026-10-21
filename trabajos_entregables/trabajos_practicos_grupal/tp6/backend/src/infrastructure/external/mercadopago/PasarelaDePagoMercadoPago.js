@@ -19,7 +19,7 @@ export class PasarelaDePagoMercadoPago extends PasarelaDePago {
     const listaVisitantes = visitantes || (compra ? compra.visitantes : [])
     const emailPayerReal = email || (compra ? (compra.email?.valor || compra.email) : '')
     const emailPayer = (process.env.NODE_ENV !== 'test' && !emailPayerReal.includes('@testuser.com'))
-      ? 'test_user_2573299940366315940@testuser.com'
+      ? 'test_user_8207705484891376030@testuser.com'
       : emailPayerReal
 
     const idCompra = compra?.id
