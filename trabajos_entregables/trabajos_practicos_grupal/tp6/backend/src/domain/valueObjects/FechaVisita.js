@@ -10,7 +10,7 @@ export class FechaVisita {
   constructor (valor) {
     this.valor = valor
   }
-  static crear (fechaString) {
+  static crear (fechaString, hoy = new Date()) {
     const coincidencia = FORMATO_DD_MM_AAAA.exec(fechaString ?? '')
     if (!coincidencia) {
       throw new FechaVisitaInvalidaError('La fecha debe tener el formato dd-mm-aaaa')
@@ -22,6 +22,10 @@ export class FechaVisita {
     const fecha = new Date(anio, mes - 1, dia)
     if (!esFechaCalendarioValida(dia, mes, anio, fecha)) {
       throw new FechaVisitaInvalidaError('La fecha ingresada no existe en el calendario')
+    }
+    const anioHoy = hoy.getFullYear()
+    if (anio < anioHoy || anio > anioHoy + 1) {
+      throw new FechaVisitaInvalidaError('El año de la fecha de visita es inválido')
     }
     return new FechaVisita(fechaString)
   }
