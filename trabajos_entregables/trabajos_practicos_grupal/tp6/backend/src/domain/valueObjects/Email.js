@@ -7,8 +7,8 @@ export class Email {
   }
 
   static crear (valor) {
-    if (!valor || !valor.trim()) {
-      throw new EmailInvalidoError('El email no puede estar vacío')
+    if (!valor || !String(valor).trim()) {
+      throw new EmailInvalidoError('El email ingresado no tiene un formato válido')
     }
     return new Email(valor)
   }
