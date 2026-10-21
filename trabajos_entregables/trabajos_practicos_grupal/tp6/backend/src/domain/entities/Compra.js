@@ -12,8 +12,46 @@ import {
   FORMAS_PAGO_VALIDAS
 } from '../../config/parque.config.js'
 
+function validarCantidadEntradas (cantidad, visitantes) {
+  if (
+    typeof cantidad !== 'number' ||
+    cantidad < CANTIDAD_MINIMA_ENTRADAS ||
+    cantidad > CANTIDAD_MAXIMA_ENTRADAS
+  ) {
+    throw new CantidadEntradasInvalidaError(
+      `La cantidad de entradas debe estar entre ${CANTIDAD_MINIMA_ENTRADAS} y ${CANTIDAD_MAXIMA_ENTRADAS}`
+    )
+  }
+
+  if (!Array.isArray(visitantes) || visitantes.length !== cantidad) {
+    throw new CantidadEntradasInvalidaError(
+      `La cantidad de entradas (${cantidad}) no coincide con la cantidad de visitantes registrados (${visitantes?.length ?? 0})`
+    )
+  }
+}
+
+function validarFormaPago (formaPago) {
+  const normalizada = (formaPago || '').toLowerCase()
+  if (!FORMAS_PAGO_VALIDAS.includes(normalizada)) {
+    throw new FormaPagoInvalidaError(
+      `Forma de pago inválida: "${formaPago}". Formas válidas: ${FORMAS_PAGO_VALIDAS.join(', ')}`
+    )
+  }
+  return normalizada
+}
+
 export class Compra {
-  constructor ({ id, nombreComprador, fechaVisita, email, visitantes, formaPago, cantidadEntradas, montoTotal, fechaCreacion }) {
+  constructor ({
+    id,
+    nombreComprador,
+    fechaVisita,
+    email,
+    visitantes,
+    formaPago,
+    cantidadEntradas,
+    montoTotal,
+    fechaCreacion
+  }) {
     this.id = id || crypto.randomUUID()
     this.nombreComprador = (nombreComprador || '').trim()
     this.fechaVisita = fechaVisita
@@ -28,30 +66,21 @@ export class Compra {
   }
 
   static crear (datos, hoy = new Date()) {
-    const normalizada = (datos.formaPago || '').toLowerCase()
-    if (!FORMAS_PAGO_VALIDAS.includes(normalizada)) {
-      throw new FormaPagoInvalidaError('Forma de pago invalida')
-    }
-    if (datos.cantidadEntradas < CANTIDAD_MINIMA_ENTRADAS || datos.cantidadEntradas > CANTIDAD_MAXIMA_ENTRADAS) {
-      throw new CantidadEntradasInvalidaError('Cantidad invalida')
-    }
-    const visitantes = datos.visitantes || []
-    if (visitantes.length !== datos.cantidadEntradas) {
-      throw new CantidadEntradasInvalidaError('Cantidad no coincide')
-    }
-    const fechaVO = FechaVisita.crear(datos.fechaVisita, hoy)
+    validarCantidadEntradas(datos.cantidadEntradas, datos.visitantes)
+    const formaPagoNormalizada = validarFormaPago(datos.formaPago)
+    const fechaVisitaVO = FechaVisita.crear(datos.fechaVisita, hoy)
     const emailVO = Email.crear(datos.email || datos.emailComprador)
     const listaVisitantes = (datos.visitantes || []).map(v => Visitante.crear(v))
-    const total = listaVisitantes.reduce((sum, v) => sum + v.precio, 0)
+    const montoTotal = listaVisitantes.reduce((acumulado, v) => acumulado + v.precio, 0)
 
     return new Compra({
       nombreComprador: datos.nombreComprador,
-      fechaVisita: fechaVO,
+      fechaVisita: fechaVisitaVO,
       email: emailVO,
       visitantes: listaVisitantes,
-      formaPago: normalizada,
+      formaPago: formaPagoNormalizada,
       cantidadEntradas: datos.cantidadEntradas,
-      montoTotal: total
+      montoTotal
     })
   }
 
