@@ -21,4 +21,8 @@ describe('Visitante', () => {
   it('rechaza una edad negativa (< 0)', () => {
     expect(() => Visitante.crear({ edad: -1, tipoPase: 'regular' })).toThrow(VisitanteInvalidoError)
   })
+
+  it('rechaza una edad mayor a 100 años (> 100)', () => {
+    expect(() => Visitante.crear({ edad: 101, tipoPase: 'regular' })).toThrow(VisitanteInvalidoError)
+  })
 })
