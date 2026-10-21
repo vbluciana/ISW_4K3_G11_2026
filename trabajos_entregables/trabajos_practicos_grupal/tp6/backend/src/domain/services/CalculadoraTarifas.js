@@ -1,9 +1,13 @@
 import { PRECIOS_BASE, DESCUENTOS_POR_EDAD } from '../../config/parque.config.js'
+import { VisitanteInvalidoError } from '../errors/DomainError.js'
 
 export class CalculadoraTarifas {
   static calcularPrecio ({ edad, tipoPase }) {
     const normalizado = (tipoPase ?? '').toLowerCase()
-    const precioBase = PRECIOS_BASE[normalizado] || PRECIOS_BASE.regular
+    const precioBase = PRECIOS_BASE[normalizado]
+    if (precioBase === undefined) {
+      throw new VisitanteInvalidoError('El tipo de pase debe ser "regular" o "vip"')
+    }
 
     if (edad <= DESCUENTOS_POR_EDAD.SIN_CARGO_HASTA_EDAD) {
       return 0
