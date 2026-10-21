@@ -61,4 +61,9 @@ describe('Compra', () => {
     expect(() => Compra.crear(datosValidos({ cantidadEntradas: 11, visitantes: onceVisitantes }), HOY))
       .toThrow(CantidadEntradasInvalidaError)
   })
+
+  it('rechaza cuando cantidadEntradas no coincide con la cantidad de visitantes', () => {
+    expect(() => Compra.crear(datosValidos({ cantidadEntradas: 3 }), HOY))
+      .toThrow(CantidadEntradasInvalidaError)
+  })
 })
