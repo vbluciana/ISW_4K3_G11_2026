@@ -8,32 +8,59 @@ import {
 } from '../errors/DomainError.js'
 import {
   CANTIDAD_MINIMA_ENTRADAS,
-  CANTIDAD_MAXIMA_ENTRADAS
+  CANTIDAD_MAXIMA_ENTRADAS,
+  FORMAS_PAGO_VALIDAS
 } from '../../config/parque.config.js'
 
+function validarFormaPago (formaPago) {
+  const normalizada = (formaPago || '').toLowerCase()
+  if (!FORMAS_PAGO_VALIDAS.includes(normalizada)) {
+    throw new FormaPagoInvalidaError(
+      `Forma de pago inválida: "${formaPago}". Formas válidas: ${FORMAS_PAGO_VALIDAS.join(', ')}`
+    )
+  }
+  return normalizada
+}
+
+function validarCantidadEntradas (cantidad, visitantes) {
+  if (
+    typeof cantidad !== 'number' ||
+    cantidad < CANTIDAD_MINIMA_ENTRADAS ||
+    cantidad > CANTIDAD_MAXIMA_ENTRADAS
+  ) {
+    throw new CantidadEntradasInvalidaError(
+      `La cantidad de entradas debe estar entre ${CANTIDAD_MINIMA_ENTRADAS} y ${CANTIDAD_MAXIMA_ENTRADAS}`
+    )
+  }
+
+  if (!Array.isArray(visitantes) || visitantes.length !== cantidad) {
+    throw new CantidadEntradasInvalidaError(
+      `La cantidad de entradas (${cantidad}) no coincide con la cantidad de visitantes registrados (${visitantes?.length ?? 0})`
+    )
+  }
+}
+
 export class Compra {
-  constructor (params) {
-    Object.assign(this, params)
-    this.id = params.id || crypto.randomUUID()
-    this.emailComprador = params.email.valor
+  constructor ({ id, nombreComprador, fechaVisita, email, visitantes, formaPago, cantidadEntradas, montoTotal, fechaCreacion }) {
+    this.id = id || crypto.randomUUID()
+    this.nombreComprador = (nombreComprador || '').trim()
+    this.fechaVisita = fechaVisita
+    this.email = email
+    this.emailComprador = email.valor
+    this.visitantes = Object.freeze([...visitantes])
+    this.formaPago = formaPago
+    this.cantidadEntradas = cantidadEntradas
+    this.montoTotal = montoTotal
+    this.fechaCreacion = fechaCreacion || new Date()
     Object.freeze(this)
   }
 
   static crear (datos, hoy = new Date()) {
-    const pago = (datos.formaPago || '').toLowerCase()
-    if (pago !== 'efectivo' && pago !== 'tarjeta') {
-      throw new FormaPagoInvalidaError('Forma de pago no soportada')
-    }
-    if (datos.cantidadEntradas < CANTIDAD_MINIMA_ENTRADAS || datos.cantidadEntradas > CANTIDAD_MAXIMA_ENTRADAS) {
-      throw new CantidadEntradasInvalidaError('Cantidad fuera de rango')
-    }
-    const visitantes = datos.visitantes || []
-    if (visitantes.length !== datos.cantidadEntradas) {
-      throw new CantidadEntradasInvalidaError('No coincide la cantidad de visitantes')
-    }
+    validarCantidadEntradas(datos.cantidadEntradas, datos.visitantes)
+    const pagoNormalizado = validarFormaPago(datos.formaPago)
     const fechaVO = FechaVisita.crear(datos.fechaVisita, hoy)
     const emailVO = Email.crear(datos.email || datos.emailComprador)
-    const listaVisitantes = visitantes.map(v => Visitante.crear(v))
+    const listaVisitantes = (datos.visitantes || []).map(v => Visitante.crear(v))
     const total = listaVisitantes.reduce((sum, v) => sum + v.precio, 0)
 
     return new Compra({
@@ -41,7 +68,7 @@ export class Compra {
       fechaVisita: fechaVO,
       email: emailVO,
       visitantes: listaVisitantes,
-      formaPago: pago,
+      formaPago: pagoNormalizado,
       cantidadEntradas: datos.cantidadEntradas,
       montoTotal: total
     })
