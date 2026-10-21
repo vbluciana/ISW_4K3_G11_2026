@@ -20,6 +20,7 @@ function esFeriadoCerrado (dia, mes) {
 export class FechaVisita {
   constructor (valor) {
     this.valor = valor
+    Object.freeze(this)
   }
   static crear (fechaString, hoy = new Date()) {
     const coincidencia = FORMATO_DD_MM_AAAA.exec(fechaString ?? '')
