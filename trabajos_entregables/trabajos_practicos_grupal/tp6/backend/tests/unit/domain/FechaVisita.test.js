@@ -40,4 +40,9 @@ describe('FechaVisita', () => {
 
     expect(fechaVisita.valor).toBe('17-10-2026')
   })
+
+  it('rechaza los lunes porque el parque cierra ese día', () => {
+    // 19-10-2026 es lunes.
+    expect(() => FechaVisita.crear('19-10-2026', HOY)).toThrow(FechaVisitaInvalidaError)
+  })
 })
