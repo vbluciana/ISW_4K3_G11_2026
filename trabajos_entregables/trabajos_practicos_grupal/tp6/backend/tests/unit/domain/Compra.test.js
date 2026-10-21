@@ -1,0 +1,43 @@
+import { describe, it, expect } from 'vitest'
+import { Compra } from '../../../src/domain/entities/Compra.js'
+import {
+  FechaVisitaInvalidaError,
+  CantidadEntradasInvalidaError,
+  VisitanteInvalidoError,
+  FormaPagoInvalidaError,
+  EmailInvalidoError
+} from '../../../src/domain/errors/DomainError.js'
+
+// Sábado 17-10-2026, día hábil fijo
+const HOY = new Date(2026, 9, 17)
+
+function datosValidos (overrides = {}) {
+  return {
+    nombreComprador: 'Ana Gómez',
+    fechaVisita: '20-10-2026',
+    cantidadEntradas: 2,
+    visitantes: [
+      { edad: 30, tipoPase: 'regular' },
+      { edad: 10, tipoPase: 'regular' }
+    ],
+    formaPago: 'efectivo',
+    email: 'visitante@ecoharmony.com',
+    ...overrides
+  }
+}
+
+describe('Compra', () => {
+  it('se crea correctamente con datos válidos y calcula el monto total', () => {
+    const compra = Compra.crear(datosValidos(), HOY)
+
+    expect(compra.nombreComprador).toBe('Ana Gómez')
+    expect(compra.fechaVisita.valor).toBe('20-10-2026')
+    expect(compra.formaPago).toBe('efectivo')
+    expect(compra.email.valor).toBe('visitante@ecoharmony.com')
+    expect(compra.emailComprador).toBe('visitante@ecoharmony.com')
+    expect(compra.visitantes).toHaveLength(2)
+    expect(compra.montoTotal).toBe(15000)
+    expect(compra.id).toBeDefined()
+    expect(Object.isFrozen(compra)).toBe(true)
+  })
+})
