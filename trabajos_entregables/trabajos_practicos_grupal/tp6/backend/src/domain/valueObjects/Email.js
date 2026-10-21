@@ -7,7 +7,7 @@ export class Email {
   }
 
   static crear (valor) {
-    if (!valor || !valor.includes('@')) {
+    if (!valor || !String(valor).includes('@')) {
       throw new EmailInvalidoError('El email ingresado no tiene un formato válido')
     }
     return new Email(valor)
