@@ -15,13 +15,8 @@ export class ComprarEntradas {
     const compra = Compra.crear(datos, fechaReferencia)
 
     let pago = null
-    if (compra.formaPago === 'tarjeta' && this.#pasarelaDePago) {
-      pago = await this.#pasarelaDePago.crearPreferenciaPago({
-        compra,
-        email: compra.email.valor,
-        visitantes: compra.visitantes,
-        montoTotal: compra.montoTotal
-      })
+    if (compra.formaPago === 'tarjeta') {
+      pago = await this.#procesarPagoTarjeta(compra)
     }
 
     if (this.#repositorioCompras) {
@@ -30,6 +25,7 @@ export class ComprarEntradas {
 
     const comprobante = this.#armarComprobante(compra, pago)
 
+    // En efectivo se envia el email de reserva; en tarjeta se aguarda confirmacion del webhook
     if (compra.formaPago === 'efectivo' && this.#servicioEmail) {
       await this.#servicioEmail.enviarComprobante({
         email: compra.email.valor,
@@ -38,6 +34,18 @@ export class ComprarEntradas {
     }
 
     return { comprobante, pago: pago || undefined }
+  }
+
+  async #procesarPagoTarjeta (compra) {
+    if (!this.#pasarelaDePago) {
+      return null
+    }
+    return await this.#pasarelaDePago.crearPreferenciaPago({
+      compra,
+      email: compra.email.valor,
+      visitantes: compra.visitantes,
+      montoTotal: compra.montoTotal
+    })
   }
 
   #armarComprobante (compra, pago = null) {
