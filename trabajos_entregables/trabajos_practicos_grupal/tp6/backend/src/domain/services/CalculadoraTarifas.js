@@ -1,3 +1,5 @@
 export class CalculadoraTarifas {
-  static calcularPrecio () { return 0 }
+  static calcularPrecio () {
+    return 10000
+  }
 }
