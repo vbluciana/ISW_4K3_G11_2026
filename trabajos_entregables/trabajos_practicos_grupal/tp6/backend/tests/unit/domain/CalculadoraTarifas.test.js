@@ -25,4 +25,9 @@ describe('CalculadoraTarifas', () => {
     expect(CalculadoraTarifas.calcularPrecio({ edad: 60, tipoPase: 'regular' })).toBe(5000)
     expect(CalculadoraTarifas.calcularPrecio({ edad: 85, tipoPase: 'vip' })).toBe(10000)
   })
+
+  it('no aplica descuento a un joven de 16 a 59 años', () => {
+    expect(CalculadoraTarifas.calcularPrecio({ edad: 16, tipoPase: 'regular' })).toBe(10000)
+    expect(CalculadoraTarifas.calcularPrecio({ edad: 59, tipoPase: 'vip' })).toBe(20000)
+  })
 })
