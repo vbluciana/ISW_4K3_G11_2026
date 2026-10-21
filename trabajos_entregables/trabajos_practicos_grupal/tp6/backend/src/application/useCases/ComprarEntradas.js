@@ -13,6 +13,24 @@ export class ComprarEntradas {
 
   async ejecutar (datos, fechaReferencia = new Date()) {
     const compra = Compra.crear(datos, fechaReferencia)
-    return { compra }
+    if (this.#repositorioCompras) {
+      await this.#repositorioCompras.guardar(compra)
+    }
+    const comprobante = {
+      idReserva: compra.id,
+      nombreComprador: compra.nombreComprador,
+      emailComprador: compra.email.valor,
+      fechaVisita: compra.fechaVisita.valor,
+      cantidadEntradas: compra.cantidadEntradas,
+      visitantes: compra.visitantes.map(v => (typeof v.toJSON === 'function' ? v.toJSON() : v)),
+      formaPago: compra.formaPago,
+      montoTotal: compra.montoTotal,
+      estado: 'PENDIENTE_PAGO_BOLETERIA',
+      fechaEmision: new Date().toISOString()
+    }
+    if (this.#servicioEmail) {
+      await this.#servicioEmail.enviarComprobante({ email: compra.email.valor, comprobante })
+    }
+    return { comprobante }
   }
 }
