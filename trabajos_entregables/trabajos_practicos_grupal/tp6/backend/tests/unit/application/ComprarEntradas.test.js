@@ -81,4 +81,16 @@ describe('ComprarEntradas', () => {
     expect(pasarelaDePago.llamadas).toHaveLength(1)
     expect(servicioEmail.enviados).toHaveLength(0)
   })
+
+  it('rechaza la operación si la pasarela falla: no persiste la compra ni envía email', async () => {
+    pasarelaDePago.fallar = true
+    const datosTarjeta = datosValidos({ formaPago: 'tarjeta' })
+
+    await expect(casoDeUso.ejecutar(datosTarjeta, HOY))
+      .rejects
+      .toThrow(PagoRechazadoError)
+
+    expect(await repositorioCompras.listarTodas()).toHaveLength(0)
+    expect(servicioEmail.enviados).toHaveLength(0)
+  })
 })
