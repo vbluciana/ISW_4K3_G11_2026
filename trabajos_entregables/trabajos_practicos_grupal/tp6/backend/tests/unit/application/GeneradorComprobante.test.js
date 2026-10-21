@@ -28,4 +28,8 @@ describe('generadorComprobante', () => {
     expect(comprobante.formaPago).toBe('efectivo')
     expect(comprobante.email).toBe('visitante@ecoharmony.com')
   })
+
+  it('formatea el monto total como moneda argentina', () => {
+    expect(comprobante.montoTotal).toBe(FORMATO_MONEDA_ARS.format(20000))
+  })
 })
