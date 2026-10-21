@@ -36,6 +36,7 @@ export class FechaVisita {
       throw new FechaVisitaInvalidaError('El año de la fecha de visita es inválido')
     }
 
+    // Se valida fecha anterior al inicio del día antes de chequear el día de la semana
     if (iniciarDia(fecha) < iniciarDia(hoy)) {
       throw new FechaVisitaInvalidaError('La fecha de visita no puede ser anterior al día de hoy')
     }
